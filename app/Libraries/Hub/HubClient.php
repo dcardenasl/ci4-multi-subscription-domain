@@ -24,11 +24,25 @@ class HubClient extends CoreHubClient
             'headers' => array_merge($this->appKeyHeaders(), [
                 'Authorization' => 'Bearer ' . $bearerToken,
             ]),
-            'query' => ['filter[code]' => $code, 'per_page' => 1],
+            'query' => ['per_page' => 100],
         ]);
 
-        $items = $data['items'] ?? $data;
-        return is_array($items) ? ($items[0] ?? null) : null;
+        $items = $data['items'] ?? $data['data'] ?? $data;
+        if (! is_array($items)) {
+            return null;
+        }
+
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            if (($item['code'] ?? null) === $code) {
+                return $item;
+            }
+        }
+
+        return null;
     }
 
     /**

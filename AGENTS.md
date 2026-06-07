@@ -1,4 +1,4 @@
-# ci4-domain-starter
+# ci4-multi-subscription-domain
 
 Domain app template (port 8090). Owns its own business logic and database tables.
 Delegates auth and IAM to a central hub (`ci4-api-starter`). Never issues JWTs.

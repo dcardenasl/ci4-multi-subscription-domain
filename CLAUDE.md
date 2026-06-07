@@ -18,7 +18,7 @@ For cross-repo context, read `../TASKS.md`.
 
 ## What this is
 
-`ci4-domain-starter` is a CodeIgniter 4 **domain app** template. It owns its own
+`ci4-multi-subscription-domain` is a CodeIgniter 4 **domain app** template. It owns its own
 business logic and database tables, but **delegates auth and IAM to a central
 hub** — a separate `ci4-api-starter` instance that stores users, applications,
 roles and permissions.

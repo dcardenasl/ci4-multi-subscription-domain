@@ -61,6 +61,6 @@ class CreateRequestLogsTable extends Migration
 
     public function down(): void
     {
-        $this->forge->dropTable('request_logs');
+        $this->forge->dropTable('request_logs', true);
     }
 }

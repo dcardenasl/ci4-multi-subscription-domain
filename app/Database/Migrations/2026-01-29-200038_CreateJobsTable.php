@@ -51,6 +51,6 @@ class CreateJobsTable extends Migration
 
     public function down(): void
     {
-        $this->forge->dropTable('jobs');
+        $this->forge->dropTable('jobs', true);
     }
 }

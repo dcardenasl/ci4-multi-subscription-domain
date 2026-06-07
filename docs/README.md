@@ -1,6 +1,6 @@
 # Documentation Index
 
-Documentation for **ci4-domain-starter** — a CodeIgniter 4 template for domain apps that delegate auth and IAM to a central hub. This index only lists files that exist in the template.
+Documentation for **ci4-multi-subscription-domain** — a CodeIgniter 4 template for domain apps that delegate auth and IAM to a central hub. This index only lists files that exist in the template.
 
 > **New here?** Start with the root [`README.md`](../README.md) for quickstart and the architecture diagram, then [`CLAUDE.md`](../CLAUDE.md) for working agreements. Spanish version: [README.es.md](README.es.md).
 

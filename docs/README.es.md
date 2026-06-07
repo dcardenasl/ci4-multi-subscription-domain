@@ -1,6 +1,6 @@
 # Índice de documentación
 
-Documentación de **ci4-domain-starter** — plantilla de CodeIgniter 4 para apps de dominio que delegan auth e IAM a un hub central. Este índice solo lista archivos que existen en la plantilla.
+Documentación de **ci4-multi-subscription-domain** — plantilla de CodeIgniter 4 para apps de dominio que delegan auth e IAM a un hub central. Este índice solo lista archivos que existen en la plantilla.
 
 > **¿Primera vez aquí?** Empieza por el [`README.es.md`](../README.es.md) raíz para el quickstart y el diagrama de arquitectura, luego [`CLAUDE.md`](../CLAUDE.md) para los acuerdos de trabajo. English version: [README.md](README.md).
 

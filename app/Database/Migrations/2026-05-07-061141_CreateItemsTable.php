@@ -47,6 +47,6 @@ class CreateItemsTable extends Migration
 
     public function down(): void
     {
-        $this->forge->dropTable('items');
+        $this->forge->dropTable('items', true);
     }
 }

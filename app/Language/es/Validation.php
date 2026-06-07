@@ -34,4 +34,7 @@ return [
 
     // Mensaje de regla de lista secuencial
     'is_list' => 'El campo {field} debe ser una lista secuencial de valores.',
+
+    // Mensajes de regla de suscriptor newsletter
+    'already_subscribed' => 'La dirección de correo ya está suscrita a este proyecto.',
 ];

@@ -191,16 +191,31 @@ class HubClientTest extends CIUnitTestCase
         ], 'expired');
     }
 
-    public function testFindRoleByCodeReturnsFirstItemFromHubResponse(): void
+    public function testFindRoleByCodeReturnsExactCodeMatchFromHubResponse(): void
     {
-        $roleData = ['id' => 5, 'code' => 'superadmin', 'name' => 'Super Admin'];
+        $roleData = ['id' => 2, 'code' => 'admin', 'name' => 'Administrator'];
         $http     = $this->createMock(CURLRequest::class);
-        $http->method('request')->willReturn($this->jsonResponse(200, [
-            'data' => ['items' => [$roleData], 'meta' => ['total' => 1]],
-        ]));
+        $http->expects($this->once())
+            ->method('request')
+            ->with(
+                'GET',
+                $this->stringContains('/api/v1/iam/roles'),
+                $this->callback(function (array $options) use ($roleData): bool {
+                    $this->assertSame(100, $options['query']['per_page'] ?? null);
+                    $this->assertArrayNotHasKey('search', $options['query'] ?? []);
+
+                    return true;
+                })
+            )
+            ->willReturn($this->jsonResponse(200, [
+                'data' => [
+                    ['id' => 1, 'code' => 'superadmin', 'name' => 'Super Administrator'],
+                    $roleData,
+                ],
+            ]));
 
         $client = new HubClient($this->makeConfig(), $http, $this->createMock(CacheInterface::class));
-        $result = $client->findRoleByCode('superadmin', 'admin-token');
+        $result = $client->findRoleByCode('admin', 'admin-token');
 
         $this->assertSame($roleData, $result);
     }

@@ -68,6 +68,6 @@ class CreateAuditLogsTable extends Migration
 
     public function down(): void
     {
-        $this->forge->dropTable('audit_logs');
+        $this->forge->dropTable('audit_logs', true);
     }
 }

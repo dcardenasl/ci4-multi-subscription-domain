@@ -43,6 +43,6 @@ class CreateMetricsTable extends Migration
 
     public function down(): void
     {
-        $this->forge->dropTable('metrics');
+        $this->forge->dropTable('metrics', true);
     }
 }

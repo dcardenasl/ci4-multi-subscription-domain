@@ -34,4 +34,7 @@ return [
 
     // Sequential list rule message
     'is_list' => 'The {field} must be a sequential list of values.',
+
+    // Newsletter subscriber rule messages
+    'already_subscribed' => 'The email address is already subscribed to this project.',
 ];
