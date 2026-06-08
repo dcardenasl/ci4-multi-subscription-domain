@@ -36,5 +36,8 @@ class DomainPermissions
         ['code' => 'newsletter.deliveries.read',  'resource' => 'deliveries',  'action' => 'read',   'description' => 'Read Newsletter Deliveries'],
         ['code' => 'newsletter.deliveries.write', 'resource' => 'deliveries',  'action' => 'write',  'description' => 'Create or update Newsletter Delivery'],
         ['code' => 'newsletter.deliveries.delete','resource' => 'deliveries',  'action' => 'delete', 'description' => 'Delete Newsletter Delivery'],
+        ['code' => 'newsletter.emailtemplates.read', 'resource' => 'email-templates', 'action' => 'read', 'description' => 'Read EmailTemplates'],
+        ['code' => 'newsletter.emailtemplates.write', 'resource' => 'email-templates', 'action' => 'write', 'description' => 'Create or update EmailTemplate'],
+        ['code' => 'newsletter.emailtemplates.delete', 'resource' => 'email-templates', 'action' => 'delete', 'description' => 'Delete EmailTemplate'],
     ];
 }

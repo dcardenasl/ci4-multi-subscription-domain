@@ -62,4 +62,18 @@ trait NewsletterDomainServices
         }
         return new \App\Services\Newsletter\DeliveryService(new \dcardenasl\Ci4ApiCore\Repositories\GenericRepository(model(\App\Models\DeliveryModel::class)), static::deliveryResponseMapper());
     }
+    public static function emailTemplateResponseMapper(bool $getShared = true): \dcardenasl\Ci4ApiCore\Mappers\ResponseMapperInterface
+    {
+        if ($getShared) {
+            return static::getSharedInstance('emailTemplateResponseMapper');
+        }
+        return new \dcardenasl\Ci4ApiCore\Mappers\DtoResponseMapper(\App\DTO\Response\Newsletter\EmailTemplateResponseDTO::class);
+    }
+    public static function emailTemplateService(bool $getShared = true): \App\Interfaces\Newsletter\EmailTemplateServiceInterface
+    {
+        if ($getShared) {
+            return static::getSharedInstance('emailTemplateService');
+        }
+        return new \App\Services\Newsletter\EmailTemplateService(new \dcardenasl\Ci4ApiCore\Repositories\GenericRepository(model(\App\Models\EmailTemplateModel::class)), static::emailTemplateResponseMapper());
+    }
 }

@@ -1,21 +1,15 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
 /** @var \CodeIgniter\Router\RouteCollection $routes */
 $routes->group('newsletter', ['namespace' => '\App\Controllers\Api\V1\Newsletter'], function ($routes): void {
     // Public routes (no auth required)
     $routes->post('subscribers', 'SubscriberController::subscribe');
-    $routes->get('subscribers/confirm/(:segment)', 'SubscriberController::confirm/$1');
     $routes->post('subscribers/unsubscribe', 'SubscriberController::unsubscribe');
-    $routes->get('projects/(:segment)/config', 'ProjectController::config/$1');
-    $routes->get('track/open/(:segment)', 'TrackingController::open/$1');
-    $routes->get('track/click/(:segment)', 'TrackingController::click/$1');
-
     // Webhooks (no auth required)
     $routes->post('webhooks/ses', 'WebhookController::ses');
     $routes->post('webhooks/sendgrid', 'WebhookController::sendgrid');
     $routes->post('webhooks/mailgun', 'WebhookController::mailgun');
-
     // Auth & Admin Protected Group
     $routes->group('', ['filter' => ['domainauth', 'throttle']], function ($routes): void {
         $routes->group('', ['filter' => 'permission:newsletter.projects.read'], function ($routes): void {
@@ -61,5 +55,20 @@ $routes->group('newsletter', ['namespace' => '\App\Controllers\Api\V1\Newsletter
         $routes->group('', ['filter' => 'permission:newsletter.deliveries.delete'], function ($routes): void {
             $routes->delete('deliveries/(:num)', 'DeliveryController::delete/$1');
         });
+        $routes->group('', ['filter' => 'permission:newsletter.emailtemplates.read'], function ($routes): void {
+            $routes->get('email-templates', 'EmailTemplateController::index');
+            $routes->get('email-templates/(:num)', 'EmailTemplateController::show/$1');
+        });
+        $routes->group('', ['filter' => 'permission:newsletter.emailtemplates.write'], function ($routes): void {
+            $routes->post('email-templates', 'EmailTemplateController::create');
+            $routes->put('email-templates/(:num)', 'EmailTemplateController::update/$1');
+        });
+        $routes->group('', ['filter' => 'permission:newsletter.emailtemplates.delete'], function ($routes): void {
+            $routes->delete('email-templates/(:num)', 'EmailTemplateController::delete/$1');
+        });
     });
+    $routes->get('subscribers/confirm/(:segment)', 'SubscriberController::confirm/$1');
+    $routes->get('projects/(:segment)/config', 'ProjectController::config/$1');
+    $routes->get('track/open/(:segment)', 'TrackingController::open/$1');
+    $routes->get('track/click/(:segment)', 'TrackingController::click/$1');
 });

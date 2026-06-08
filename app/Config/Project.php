@@ -18,4 +18,11 @@ class Project extends BaseConfig
     public string $name = 'CodeIgniter 4 Domain Starter';
     public string $description = 'CodeIgniter 4 domain app starter that delegates authentication and IAM to a central hub.';
     public string $version = '1.2.1';
+    public string $bffUrl = 'http://localhost:8088';
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->bffUrl = env('BFF_URL', 'http://localhost:8088');
+    }
 }

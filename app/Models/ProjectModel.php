@@ -20,7 +20,7 @@ class ProjectModel extends BaseAuditableModel
     protected $useSoftDeletes = true;
     protected $useTimestamps = true;
 
-    protected $allowedFields = ['name', 'slug', 'project_key', 'is_active', 'smtp_provider', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass_encrypted', 'smtp_crypto', 'smtp_from_name', 'smtp_from_email', 'double_opt_in_enabled', 'locale_default', 'recaptcha_site_key', 'recaptcha_secret_key'];
+    protected $allowedFields = ['name', 'slug', 'project_key', 'is_active', 'smtp_provider', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass_encrypted', 'smtp_crypto', 'smtp_from_name', 'smtp_from_email', 'double_opt_in_enabled', 'double_opt_in_template_id', 'welcome_template_id', 'locale_default', 'recaptcha_site_key', 'recaptcha_secret_key'];
 
     /** @var array<int, string> */
     protected array $searchableFields = [];
@@ -45,6 +45,8 @@ class ProjectModel extends BaseAuditableModel
         'smtp_from_name' => 'permit_empty|string|max_length[255]',
         'smtp_from_email' => 'permit_empty|string|max_length[255]',
         'double_opt_in_enabled' => 'required|boolean_like',
+        'double_opt_in_template_id' => 'permit_empty|integer',
+        'welcome_template_id' => 'permit_empty|integer',
         'locale_default' => 'required|string|max_length[255]',
         'recaptcha_site_key' => 'permit_empty|string|max_length[255]',
         'recaptcha_secret_key' => 'permit_empty|string|max_length[255]',

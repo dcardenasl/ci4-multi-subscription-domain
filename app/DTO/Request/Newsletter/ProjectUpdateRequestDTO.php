@@ -36,6 +36,10 @@ readonly class ProjectUpdateRequestDTO extends BaseRequestDTO
     public ?string $smtp_from_email;
     #[OA\Property(description: 'double_opt_in_enabled', type: 'boolean', nullable: true)]
     public ?bool $double_opt_in_enabled;
+    #[OA\Property(description: 'double_opt_in_template_id', type: 'integer', nullable: true)]
+    public ?int $double_opt_in_template_id;
+    #[OA\Property(description: 'welcome_template_id', type: 'integer', nullable: true)]
+    public ?int $welcome_template_id;
     #[OA\Property(description: 'locale_default', type: 'string', nullable: true)]
     public ?string $locale_default;
     #[OA\Property(description: 'recaptcha_site_key', type: 'string', nullable: true)]
@@ -62,6 +66,8 @@ readonly class ProjectUpdateRequestDTO extends BaseRequestDTO
             'smtp_from_name' => 'permit_empty|string|max_length[255]',
             'smtp_from_email' => 'permit_empty|string|max_length[255]',
             'double_opt_in_enabled' => 'permit_empty|boolean_like',
+            'double_opt_in_template_id' => 'permit_empty|integer',
+            'welcome_template_id' => 'permit_empty|integer',
             'locale_default' => 'permit_empty|string|max_length[255]',
             'recaptcha_site_key' => 'permit_empty|string|max_length[255]',
             'recaptcha_secret_key' => 'permit_empty|string|max_length[255]',
@@ -86,6 +92,8 @@ readonly class ProjectUpdateRequestDTO extends BaseRequestDTO
         $this->smtp_from_name = $data['smtp_from_name'] ?? null;
         $this->smtp_from_email = $data['smtp_from_email'] ?? null;
         $this->double_opt_in_enabled = isset($data['double_opt_in_enabled']) ? (bool) $data['double_opt_in_enabled'] : null;
+        $this->double_opt_in_template_id = isset($data['double_opt_in_template_id']) ? (int) $data['double_opt_in_template_id'] : null;
+        $this->welcome_template_id = isset($data['welcome_template_id']) ? (int) $data['welcome_template_id'] : null;
         $this->locale_default = $data['locale_default'] ?? null;
         $this->recaptcha_site_key = $data['recaptcha_site_key'] ?? null;
         $this->recaptcha_secret_key = $data['recaptcha_secret_key'] ?? null;
@@ -96,7 +104,7 @@ readonly class ProjectUpdateRequestDTO extends BaseRequestDTO
      */
     public function toArray(): array
     {
-        return array_filter([
+        $arr = [
             'name' => $this->name,
             'slug' => $this->slug,
             'project_key' => $this->project_key,
@@ -110,9 +118,13 @@ readonly class ProjectUpdateRequestDTO extends BaseRequestDTO
             'smtp_from_name' => $this->smtp_from_name,
             'smtp_from_email' => $this->smtp_from_email,
             'double_opt_in_enabled' => $this->double_opt_in_enabled,
+            'double_opt_in_template_id' => $this->double_opt_in_template_id,
+            'welcome_template_id' => $this->welcome_template_id,
             'locale_default' => $this->locale_default,
             'recaptcha_site_key' => $this->recaptcha_site_key,
             'recaptcha_secret_key' => $this->recaptcha_secret_key,
-        ], static fn (mixed $value): bool => $value !== null);
+        ];
+
+        return array_filter($arr, static fn (mixed $value): bool => $value !== null);
     }
 }

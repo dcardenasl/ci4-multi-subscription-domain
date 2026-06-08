@@ -43,6 +43,10 @@ final readonly class ProjectResponseDTO implements DataTransferObjectInterface
         public string $smtp_from_email,
         #[OA\Property(description: 'double_opt_in_enabled', type: 'boolean')]
         public bool $double_opt_in_enabled,
+        #[OA\Property(description: 'double_opt_in_template_id', type: 'integer', nullable: true)]
+        public ?int $double_opt_in_template_id,
+        #[OA\Property(description: 'welcome_template_id', type: 'integer', nullable: true)]
+        public ?int $welcome_template_id,
         #[OA\Property(description: 'locale_default', type: 'string')]
         public string $locale_default,
         #[OA\Property(description: 'recaptcha_site_key', type: 'string')]
@@ -76,6 +80,8 @@ final readonly class ProjectResponseDTO implements DataTransferObjectInterface
             smtp_from_name: (string) ($data['smtp_from_name'] ?? ''),
             smtp_from_email: (string) ($data['smtp_from_email'] ?? ''),
             double_opt_in_enabled: (bool) ($data['double_opt_in_enabled'] ?? false),
+            double_opt_in_template_id: isset($data['double_opt_in_template_id']) ? (int) $data['double_opt_in_template_id'] : null,
+            welcome_template_id: isset($data['welcome_template_id']) ? (int) $data['welcome_template_id'] : null,
             locale_default: (string) ($data['locale_default'] ?? ''),
             recaptcha_site_key: (string) ($data['recaptcha_site_key'] ?? ''),
             recaptcha_secret_key: (string) ($data['recaptcha_secret_key'] ?? ''),
@@ -104,6 +110,8 @@ final readonly class ProjectResponseDTO implements DataTransferObjectInterface
             'smtp_from_name' => $this->smtp_from_name,
             'smtp_from_email' => $this->smtp_from_email,
             'double_opt_in_enabled' => $this->double_opt_in_enabled,
+            'double_opt_in_template_id' => $this->double_opt_in_template_id,
+            'welcome_template_id' => $this->welcome_template_id,
             'locale_default' => $this->locale_default,
             'recaptcha_site_key' => $this->recaptcha_site_key,
             'recaptcha_secret_key' => $this->recaptcha_secret_key,

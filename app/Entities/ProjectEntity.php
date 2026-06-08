@@ -23,6 +23,8 @@ class ProjectEntity extends Entity
         'smtp_from_name' => 'string',
         'smtp_from_email' => 'string',
         'double_opt_in_enabled' => 'bool',
+        'double_opt_in_template_id' => 'int',
+        'welcome_template_id' => 'int',
         'locale_default' => 'string',
         'recaptcha_site_key' => 'string',
         'recaptcha_secret_key' => 'string',

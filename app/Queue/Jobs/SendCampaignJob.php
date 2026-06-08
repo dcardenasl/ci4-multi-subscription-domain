@@ -74,33 +74,9 @@ class SendCampaignJob extends Job
             $email->setTo($subscriber->email);
             $email->setSubject($campaign->subject);
 
-            // Dynamic template variables
-            $bffUrl = env('BFF_URL', 'http://localhost:8088');
-            $unsubscribeUrl = "{$bffUrl}/api/v1/newsletter/subscribers/unsubscribe/" . $subscriber->unsubscribe_token;
-
-            $firstName = !empty($subscriber->first_name) ? $subscriber->first_name : explode('@', $subscriber->email)[0];
-            $subscriberLocale = !empty($subscriber->locale) ? $subscriber->locale : ($project->locale_default ?? 'en');
-
-            $replacements = [
-                '{{unsubscribe_url}}' => $unsubscribeUrl,
-                '{{email}}' => $subscriber->email,
-                '{{first_name}}' => $firstName,
-            ];
-
-            $htmlBody = str_replace(array_keys($replacements), array_values($replacements), $campaign->html_body);
-            $textBody = $campaign->text_body ? str_replace(array_keys($replacements), array_values($replacements), $campaign->text_body) : '';
-
-            // Regex translation parsing for {{lang:Group.key}}
-            $langParser = function (string $body) use ($subscriberLocale): string {
-                return preg_replace_callback('/\{\{lang:([^\}]+)\}\}/i', function ($matches) use ($subscriberLocale) {
-                    return lang($matches[1], [], $subscriberLocale);
-                }, $body);
-            };
-
-            $htmlBody = $langParser($htmlBody);
-            if ($textBody !== '') {
-                $textBody = $langParser($textBody);
-            }
+            $renderer = new \App\Services\Newsletter\TemplateRendererService();
+            $htmlBody = $renderer->render($campaign->html_body, $project, $subscriber);
+            $textBody = $campaign->text_body ? $renderer->render($campaign->text_body, $project, $subscriber) : '';
 
             // Click tracking URL rewriting
             if (!empty($delivery->delivery_token)) {

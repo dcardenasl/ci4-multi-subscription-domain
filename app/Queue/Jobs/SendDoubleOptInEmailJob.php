@@ -54,13 +54,29 @@ class SendDoubleOptInEmailJob extends Job
 
         $email->setFrom($fromEmail, $fromName);
         $email->setTo($subscriber->email);
-        $email->setSubject(lang('Subscribers.confirm_subscription_subject', [], $subscriberLocale) ?? 'Confirm your subscription');
 
-        $htmlBody = lang('Subscribers.confirm_subscription_body_html', [$confirmUrl], $subscriberLocale);
-        $textBody = lang('Subscribers.confirm_subscription_body_text', [$confirmUrl], $subscriberLocale);
+        $template = null;
+        if (!empty($project->double_opt_in_template_id)) {
+            $templateModel = model(\App\Models\EmailTemplateModel::class);
+            $template = $templateModel->find($project->double_opt_in_template_id);
+        }
 
+        if ($template !== null) {
+            $renderer = new \App\Services\Newsletter\TemplateRendererService();
+            $subject = $renderer->render($template->subject, $project, $subscriber);
+            $htmlBody = $renderer->render($template->html_body, $project, $subscriber);
+            $textBody = !empty($template->text_body) ? $renderer->render($template->text_body, $project, $subscriber) : '';
+        } else {
+            $subject = lang('Subscribers.confirm_subscription_subject', [], $subscriberLocale) ?? 'Confirm your subscription';
+            $htmlBody = lang('Subscribers.confirm_subscription_body_html', [$confirmUrl], $subscriberLocale);
+            $textBody = lang('Subscribers.confirm_subscription_body_text', [$confirmUrl], $subscriberLocale);
+        }
+
+        $email->setSubject($subject);
         $email->setMessage($htmlBody);
-        $email->setAltMessage($textBody);
+        if ($textBody !== '') {
+            $email->setAltMessage($textBody);
+        }
 
         if (!$email->send()) {
             throw new \RuntimeException('Failed to send double opt-in email: ' . $email->printDebugger(['headers', 'subject', 'body']));
