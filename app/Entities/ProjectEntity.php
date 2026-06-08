@@ -29,4 +29,28 @@ class ProjectEntity extends Entity
     ];
 
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
+
+    public function setSmtpPassEncrypted(string $pass): self
+    {
+        if ($pass !== '') {
+            $encrypter = \Config\Services::encrypter();
+            $this->attributes['smtp_pass_encrypted'] = bin2hex($encrypter->encrypt($pass));
+        }
+        return $this;
+    }
+
+    public function getSmtpPassDecrypted(): string
+    {
+        $encrypted = $this->attributes['smtp_pass_encrypted'] ?? '';
+        if ($encrypted === '') {
+            return '';
+        }
+        try {
+            $encrypter = \Config\Services::encrypter();
+            return $encrypter->decrypt((string) hex2bin($encrypted));
+        } catch (\Throwable $e) {
+            // Fallback in case it wasn't hex-encoded/encrypted
+            return $encrypted;
+        }
+    }
 }

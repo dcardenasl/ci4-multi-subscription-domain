@@ -20,7 +20,7 @@ class CampaignModel extends BaseAuditableModel
     protected $useSoftDeletes = true;
     protected $useTimestamps = true;
 
-    protected $allowedFields = ['project_id', 'name', 'subject', 'html_body', 'text_body', 'status', 'scheduled_at', 'send_started_at', 'sent_at', 'failed_at', 'failure_reason'];
+    protected $allowedFields = ['project_id', 'name', 'subject', 'html_body', 'text_body', 'status', 'scheduled_at', 'send_started_at', 'sent_at', 'failed_at', 'failure_reason', 'opened_count', 'clicked_count'];
 
     /** @var array<int, string> */
     protected array $searchableFields = [];
@@ -43,5 +43,7 @@ class CampaignModel extends BaseAuditableModel
         'sent_at' => 'permit_empty|valid_date',
         'failed_at' => 'permit_empty|valid_date',
         'failure_reason' => 'permit_empty|string',
+        'opened_count' => 'permit_empty|integer',
+        'clicked_count' => 'permit_empty|integer',
     ];
 }

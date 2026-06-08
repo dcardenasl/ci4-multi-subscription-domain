@@ -8,6 +8,13 @@ $routes->group('newsletter', ['namespace' => '\App\Controllers\Api\V1\Newsletter
     $routes->get('subscribers/confirm/(:segment)', 'SubscriberController::confirm/$1');
     $routes->post('subscribers/unsubscribe', 'SubscriberController::unsubscribe');
     $routes->get('projects/(:segment)/config', 'ProjectController::config/$1');
+    $routes->get('track/open/(:segment)', 'TrackingController::open/$1');
+    $routes->get('track/click/(:segment)', 'TrackingController::click/$1');
+
+    // Webhooks (no auth required)
+    $routes->post('webhooks/ses', 'WebhookController::ses');
+    $routes->post('webhooks/sendgrid', 'WebhookController::sendgrid');
+    $routes->post('webhooks/mailgun', 'WebhookController::mailgun');
 
     // Auth & Admin Protected Group
     $routes->group('', ['filter' => ['domainauth', 'throttle']], function ($routes): void {

@@ -18,6 +18,10 @@ class DeliveryEntity extends Entity
         'attempts' => 'int',
         'last_error' => 'string',
         'provider_message_id' => 'string',
+        'delivery_token' => 'string',
+        'opened_at' => 'string',
+        'clicked_at' => 'string',
+        'clicks_count' => 'int',
         'sent_at' => 'string',
     ];
 

@@ -21,6 +21,8 @@ class CampaignEntity extends Entity
         'sent_at' => 'string',
         'failed_at' => 'string',
         'failure_reason' => 'string',
+        'opened_count' => 'integer',
+        'clicked_count' => 'integer',
     ];
 
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];

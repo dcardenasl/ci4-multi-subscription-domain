@@ -20,13 +20,13 @@ class DeliveryModel extends BaseAuditableModel
     protected $useSoftDeletes = true;
     protected $useTimestamps = true;
 
-    protected $allowedFields = ['project_id', 'campaign_id', 'subscriber_id', 'email', 'status', 'attempts', 'last_error', 'provider_message_id', 'sent_at'];
+    protected $allowedFields = ['project_id', 'campaign_id', 'subscriber_id', 'email', 'status', 'attempts', 'last_error', 'provider_message_id', 'delivery_token', 'opened_at', 'clicked_at', 'clicks_count', 'sent_at'];
 
     /** @var array<int, string> */
     protected array $searchableFields = [];
 
     /** @var array<int, string> */
-    protected array $filterableFields = ['id'];
+    protected array $filterableFields = ['id', 'delivery_token'];
 
     /** @var array<int, string> */
     protected array $sortableFields = ['id', 'created_at'];
@@ -40,6 +40,10 @@ class DeliveryModel extends BaseAuditableModel
         'attempts' => 'required|integer',
         'last_error' => 'permit_empty|string',
         'provider_message_id' => 'permit_empty|string|max_length[255]',
+        'delivery_token' => 'permit_empty|string|max_length[64]',
+        'opened_at' => 'permit_empty|valid_date',
+        'clicked_at' => 'permit_empty|valid_date',
+        'clicks_count' => 'permit_empty|integer',
         'sent_at' => 'permit_empty|valid_date',
     ];
 }
