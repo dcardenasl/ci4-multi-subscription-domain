@@ -12,6 +12,8 @@ class SubscriberEntity extends Entity
         'id' => 'integer',
         'project_id' => 'int',
         'email' => 'string',
+        'first_name' => 'string',
+        'locale' => 'string',
         'status' => 'string',
         'confirm_token' => 'string',
         'unsubscribe_token' => 'string',

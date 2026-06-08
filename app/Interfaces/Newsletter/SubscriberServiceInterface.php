@@ -15,4 +15,8 @@ interface SubscriberServiceInterface extends CrudServiceContract
     public function confirm(string $token, ?SecurityContext $context = null): DataTransferObjectInterface;
 
     public function unsubscribe(DataTransferObjectInterface $dto, ?SecurityContext $context = null): DataTransferObjectInterface;
+
+    public function handleBounce(string $email): void;
+
+    public function handleComplaint(string $email): void;
 }

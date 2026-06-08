@@ -20,7 +20,7 @@ class SubscriberModel extends BaseAuditableModel
     protected $useSoftDeletes = true;
     protected $useTimestamps = true;
 
-    protected $allowedFields = ['project_id', 'email', 'status', 'confirm_token', 'unsubscribe_token', 'invitation_code', 'confirmed_at', 'unsubscribed_at'];
+    protected $allowedFields = ['project_id', 'email', 'first_name', 'locale', 'status', 'confirm_token', 'unsubscribe_token', 'invitation_code', 'confirmed_at', 'unsubscribed_at'];
 
     /** @var array<int, string> */
     protected array $searchableFields = [];
@@ -34,6 +34,8 @@ class SubscriberModel extends BaseAuditableModel
     protected $validationRules = [
         'project_id' => 'required|integer',
         'email' => 'required|string|max_length[255]',
+        'first_name' => 'permit_empty|string|max_length[255]',
+        'locale' => 'permit_empty|string|max_length[10]',
         'status' => 'required|string|max_length[255]',
         'confirm_token' => 'permit_empty|string|max_length[255]',
         'unsubscribe_token' => 'permit_empty|string|max_length[255]',

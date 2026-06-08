@@ -16,6 +16,10 @@ readonly class PublicSubscribeRequestDTO extends BaseRequestDTO
     public string $project_key;
     #[OA\Property(description: 'invitation_code', type: 'string', nullable: true)]
     public ?string $invitation_code;
+    #[OA\Property(description: 'first_name', type: 'string', nullable: true)]
+    public ?string $first_name;
+    #[OA\Property(description: 'locale', type: 'string', nullable: true)]
+    public ?string $locale;
 
     public function rules(): array
     {
@@ -23,6 +27,8 @@ readonly class PublicSubscribeRequestDTO extends BaseRequestDTO
             'email'           => 'required|valid_email|max_length[255]',
             'project_key'     => 'required|string|max_length[255]',
             'invitation_code' => 'permit_empty|string|max_length[255]',
+            'first_name'      => 'permit_empty|string|max_length[255]',
+            'locale'          => 'permit_empty|string|max_length[10]',
         ];
     }
 
@@ -31,6 +37,8 @@ readonly class PublicSubscribeRequestDTO extends BaseRequestDTO
         $this->email           = (string) ($data['email'] ?? '');
         $this->project_key     = (string) ($data['project_key'] ?? '');
         $this->invitation_code = $data['invitation_code'] ?? null;
+        $this->first_name      = $data['first_name'] ?? null;
+        $this->locale          = $data['locale'] ?? null;
     }
 
     public function toArray(): array
@@ -39,6 +47,8 @@ readonly class PublicSubscribeRequestDTO extends BaseRequestDTO
             'email'           => $this->email,
             'project_key'     => $this->project_key,
             'invitation_code' => $this->invitation_code,
+            'first_name'      => $this->first_name,
+            'locale'          => $this->locale,
         ];
     }
 }

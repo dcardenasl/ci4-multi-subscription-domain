@@ -49,6 +49,10 @@ class AlterSubscribersNullableColumns extends Migration
 
     public function down(): void
     {
+        if ($this->db->getPlatform() === 'SQLite3') {
+            return;
+        }
+
         $this->forge->modifyColumn('subscribers', [
             'confirm_token' => [
                 'name'       => 'confirm_token',

@@ -14,6 +14,10 @@ readonly class SubscriberCreateRequestDTO extends BaseRequestDTO
     public int $project_id;
     #[OA\Property(description: 'email', type: 'string')]
     public string $email;
+    #[OA\Property(description: 'first_name', type: 'string', nullable: true)]
+    public ?string $first_name;
+    #[OA\Property(description: 'locale', type: 'string', nullable: true)]
+    public ?string $locale;
     #[OA\Property(description: 'status', type: 'string')]
     public string $status;
     #[OA\Property(description: 'confirm_token', type: 'string')]
@@ -35,6 +39,8 @@ readonly class SubscriberCreateRequestDTO extends BaseRequestDTO
         return [
             'project_id' => 'required|integer',
             'email' => 'required|string|max_length[255]',
+            'first_name' => 'permit_empty|string|max_length[255]',
+            'locale' => 'permit_empty|string|max_length[10]',
             'status' => 'required|string|max_length[255]',
             'confirm_token' => 'permit_empty|string|max_length[255]',
             'unsubscribe_token' => 'permit_empty|string|max_length[255]',
@@ -51,6 +57,8 @@ readonly class SubscriberCreateRequestDTO extends BaseRequestDTO
     {
         $this->project_id = (int) ($data['project_id'] ?? 0);
         $this->email = (string) ($data['email'] ?? '');
+        $this->first_name = $data['first_name'] ?? null;
+        $this->locale = $data['locale'] ?? null;
         $this->status = (string) ($data['status'] ?? '');
         $this->confirm_token = (string) ($data['confirm_token'] ?? '');
         $this->unsubscribe_token = (string) ($data['unsubscribe_token'] ?? '');
@@ -67,6 +75,8 @@ readonly class SubscriberCreateRequestDTO extends BaseRequestDTO
         return [
             'project_id' => $this->project_id,
             'email' => $this->email,
+            'first_name' => $this->first_name,
+            'locale' => $this->locale,
             'status' => $this->status,
             'confirm_token' => $this->confirm_token,
             'unsubscribe_token' => $this->unsubscribe_token,

@@ -55,6 +55,8 @@ class SubscriberService extends BaseCrudService implements SubscriberServiceInte
             $payload = [
                 'project_id'        => $projectResult->id,
                 'email'             => $data['email'],
+                'first_name'        => $data['first_name'] ?? null,
+                'locale'            => $data['locale'] ?? $projectResult->locale_default ?? 'en',
                 'status'            => $doubleOptIn ? 'pending' : 'confirmed',
                 'confirm_token'     => $doubleOptIn ? bin2hex(random_bytes(32)) : null,
                 'unsubscribe_token' => bin2hex(random_bytes(32)),
@@ -79,6 +81,12 @@ class SubscriberService extends BaseCrudService implements SubscriberServiceInte
             }
 
             $this->afterStore($entity, $context);
+
+            if ($doubleOptIn && !empty($entity->confirm_token)) {
+                service('queueManager')->push(\App\Queue\Jobs\SendDoubleOptInEmailJob::class, [
+                    'subscriber_id' => $entity->id,
+                ]);
+            }
 
             return $this->responseMapper->map($entity);
         });
@@ -142,6 +150,47 @@ class SubscriberService extends BaseCrudService implements SubscriberServiceInte
             }
 
             return $this->responseMapper->map($updated);
+        });
+    }
+
+    public function handleBounce(string $email): void
+    {
+        $this->wrapInTransaction(function () use ($email): void {
+            $subscribers = $this->repository->getModel()->where('email', $email)->findAll();
+            foreach ($subscribers as $subscriber) {
+                if (!($subscriber instanceof \App\Entities\SubscriberEntity)) {
+                    continue;
+                }
+                if ($subscriber->status !== 'bounced') {
+                    $this->repository->setEntityContext($subscriber->id, $subscriber);
+                    $res = $this->repository->update($subscriber->id, [
+                        'status'          => 'bounced',
+                        'unsubscribed_at' => date('Y-m-d H:i:s'),
+                    ]);
+                    if ($res === false) {
+                        log_message('error', 'BOUNCE UPDATE FAILED: ' . json_encode($this->repository->errors()));
+                    }
+                }
+            }
+        });
+    }
+
+    public function handleComplaint(string $email): void
+    {
+        $this->wrapInTransaction(function () use ($email): void {
+            $subscribers = $this->repository->getModel()->where('email', $email)->findAll();
+            foreach ($subscribers as $subscriber) {
+                if (!($subscriber instanceof \App\Entities\SubscriberEntity)) {
+                    continue;
+                }
+                if ($subscriber->status !== 'unsubscribed') {
+                    $this->repository->setEntityContext($subscriber->id, $subscriber);
+                    $this->repository->update($subscriber->id, [
+                        'status'          => 'unsubscribed',
+                        'unsubscribed_at' => date('Y-m-d H:i:s'),
+                    ]);
+                }
+            }
         });
     }
 }

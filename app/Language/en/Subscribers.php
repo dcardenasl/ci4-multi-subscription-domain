@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 return [
     'create_success' => 'Subscriber created successfully.',
+    'confirm_subscription_subject' => 'Please confirm your subscription',
+    'confirm_subscription_body_html' => '<h2>Hello!</h2><p>Thank you for subscribing. Please click the button below to confirm your subscription:</p><p><a href="{0}" style="display: inline-block; padding: 10px 20px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px;">Confirm Subscription</a></p><p>If you did not request this, please ignore this email.</p>',
+    'confirm_subscription_body_text' => "Please confirm your subscription by clicking the following link:\n\n{0}",
     'update_success' => 'Subscriber updated successfully.',
     'delete_success' => 'Subscriber deleted successfully.',
     'not_found'      => 'Subscriber not found.',

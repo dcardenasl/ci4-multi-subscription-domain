@@ -21,6 +21,10 @@ final readonly class SubscriberResponseDTO implements DataTransferObjectInterfac
         public int $project_id,
         #[OA\Property(description: 'email', type: 'string')]
         public string $email,
+        #[OA\Property(description: 'first_name', type: 'string')]
+        public string $first_name,
+        #[OA\Property(description: 'locale', type: 'string')]
+        public string $locale,
         #[OA\Property(description: 'status', type: 'string')]
         public string $status,
         #[OA\Property(description: 'confirm_token', type: 'string')]
@@ -51,6 +55,8 @@ final readonly class SubscriberResponseDTO implements DataTransferObjectInterfac
             id: (int) ($data['id'] ?? 0),
             project_id: (int) ($data['project_id'] ?? 0),
             email: (string) ($data['email'] ?? ''),
+            first_name: (string) ($data['first_name'] ?? ''),
+            locale: (string) ($data['locale'] ?? ''),
             status: (string) ($data['status'] ?? ''),
             confirm_token: (string) ($data['confirm_token'] ?? ''),
             unsubscribe_token: (string) ($data['unsubscribe_token'] ?? ''),
@@ -72,6 +78,8 @@ final readonly class SubscriberResponseDTO implements DataTransferObjectInterfac
             'id' => $this->id,
             'project_id' => $this->project_id,
             'email' => $this->email,
+            'first_name' => $this->first_name,
+            'locale' => $this->locale,
             'status' => $this->status,
             'confirm_token' => $this->confirm_token,
             'unsubscribe_token' => $this->unsubscribe_token,
