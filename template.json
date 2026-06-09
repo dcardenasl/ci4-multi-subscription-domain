@@ -1,0 +1,142 @@
+{
+  "name": "Newsletter / Multi-Subscription Domain",
+  "slug": "domain-newsletter",
+  "version": "1.0.0",
+  "description": "Multi-tenant newsletter subscription domain: projects with SMTP config, subscribers with double opt-in, campaigns, and delivery tracking.",
+  "mirror_to_hub": true,
+  "requires_bff": true,
+  "entities": [
+    {
+      "name": "Project",
+      "resource": "projects",
+      "api_path": "/newsletter/projects",
+      "title": "Newsletter Projects",
+      "fields": [
+        { "name": "name", "type": "string", "label": "Name", "required": true },
+        { "name": "slug", "type": "string", "label": "Slug", "required": true },
+        { "name": "project_key", "type": "string", "label": "Project Key", "required": true },
+        { "name": "is_active", "type": "boolean", "label": "Active", "required": true },
+        { "name": "smtp_provider", "type": "string", "label": "SMTP Provider" },
+        { "name": "smtp_host", "type": "string", "label": "SMTP Host" },
+        { "name": "smtp_port", "type": "integer", "label": "SMTP Port" },
+        { "name": "smtp_user", "type": "string", "label": "SMTP User" },
+        { "name": "smtp_pass_encrypted", "type": "text", "label": "SMTP Password (encrypted)" },
+        { "name": "smtp_crypto", "type": "string", "label": "SMTP Crypto" },
+        { "name": "smtp_from_name", "type": "string", "label": "From Name" },
+        { "name": "smtp_from_email", "type": "string", "label": "From Email" },
+        { "name": "double_opt_in_enabled", "type": "boolean", "label": "Double Opt-in", "required": true },
+        { "name": "locale_default", "type": "string", "label": "Default Locale", "required": true },
+        { "name": "recaptcha_site_key", "type": "string", "label": "reCAPTCHA Site Key" },
+        { "name": "recaptcha_secret_key", "type": "string", "label": "reCAPTCHA Secret Key" }
+      ]
+    },
+    {
+      "name": "Subscriber",
+      "resource": "subscribers",
+      "api_path": "/newsletter/subscribers",
+      "title": "Subscribers",
+      "fields": [
+        { "name": "project_id", "type": "integer", "label": "Project", "required": true },
+        { "name": "email", "type": "string", "label": "Email", "required": true },
+        { "name": "status", "type": "string", "label": "Status", "required": true },
+        { "name": "confirm_token", "type": "string", "label": "Confirm Token" },
+        { "name": "unsubscribe_token", "type": "string", "label": "Unsubscribe Token" },
+        { "name": "invitation_code", "type": "string", "label": "Invitation Code" },
+        { "name": "confirmed_at", "type": "datetime", "label": "Confirmed At" },
+        { "name": "unsubscribed_at", "type": "datetime", "label": "Unsubscribed At" }
+      ]
+    },
+    {
+      "name": "Campaign",
+      "resource": "campaigns",
+      "api_path": "/newsletter/campaigns",
+      "title": "Campaigns",
+      "fields": [
+        { "name": "project_id", "type": "integer", "label": "Project", "required": true },
+        { "name": "name", "type": "string", "label": "Name", "required": true },
+        { "name": "subject", "type": "string", "label": "Subject", "required": true },
+        { "name": "html_body", "type": "text", "label": "HTML Body", "required": true },
+        { "name": "text_body", "type": "text", "label": "Text Body" },
+        { "name": "status", "type": "string", "label": "Status", "required": true },
+        { "name": "scheduled_at", "type": "datetime", "label": "Scheduled At" },
+        { "name": "send_started_at", "type": "datetime", "label": "Send Started At" },
+        { "name": "sent_at", "type": "datetime", "label": "Sent At" },
+        { "name": "failed_at", "type": "datetime", "label": "Failed At" },
+        { "name": "failure_reason", "type": "text", "label": "Failure Reason" }
+      ]
+    },
+    {
+      "name": "Delivery",
+      "resource": "deliveries",
+      "api_path": "/newsletter/deliveries",
+      "title": "Deliveries",
+      "fields": [
+        { "name": "project_id", "type": "integer", "label": "Project", "required": true },
+        { "name": "campaign_id", "type": "integer", "label": "Campaign", "required": true },
+        { "name": "subscriber_id", "type": "integer", "label": "Subscriber", "required": true },
+        { "name": "email", "type": "string", "label": "Email", "required": true },
+        { "name": "status", "type": "string", "label": "Status", "required": true },
+        { "name": "attempts", "type": "integer", "label": "Attempts", "required": true },
+        { "name": "last_error", "type": "text", "label": "Last Error" },
+        { "name": "provider_message_id", "type": "string", "label": "Provider Message ID" },
+        { "name": "sent_at", "type": "datetime", "label": "Sent At" }
+      ]
+    }
+  ],
+  "permissions": [
+    { "code": "projects.read",     "roles": ["admin", "superadmin"] },
+    { "code": "projects.write",    "roles": ["admin", "superadmin"] },
+    { "code": "projects.delete",   "roles": ["superadmin"] },
+    { "code": "subscribers.read",  "roles": ["admin", "superadmin"] },
+    { "code": "subscribers.write", "roles": ["admin", "superadmin"] },
+    { "code": "campaigns.read",    "roles": ["admin", "superadmin"] },
+    { "code": "campaigns.write",   "roles": ["admin", "superadmin"] },
+    { "code": "campaigns.delete",  "roles": ["admin", "superadmin"] },
+    { "code": "deliveries.read",   "roles": ["admin", "superadmin"] }
+  ],
+  "admin_modules": [
+    {
+      "resource": "Project",
+      "module": "NewsletterProjects",
+      "api_path": "/newsletter/projects",
+      "service": "domain",
+      "fields": "name:string:required,slug:string:required,project_key:string:required,is_active:boolean:required,smtp_provider:string,smtp_host:string,smtp_port:int,smtp_user:string,smtp_from_name:string,smtp_from_email:string,double_opt_in_enabled:boolean:required,locale_default:string:required"
+    },
+    {
+      "resource": "Subscriber",
+      "module": "NewsletterSubscribers",
+      "api_path": "/newsletter/subscribers",
+      "service": "domain",
+      "fields": "project_id:int:required,email:string:required,status:enum:required:pending|confirmed|unsubscribed,invitation_code:string,confirmed_at:datetime,unsubscribed_at:datetime"
+    },
+    {
+      "resource": "Campaign",
+      "module": "NewsletterCampaigns",
+      "api_path": "/newsletter/campaigns",
+      "service": "domain",
+      "fields": "project_id:int:required,name:string:required,subject:string:required,html_body:text:required,text_body:text,status:enum:required:draft|scheduled|sending|sent|failed,scheduled_at:datetime"
+    },
+    {
+      "resource": "Delivery",
+      "module": "NewsletterDeliveries",
+      "api_path": "/newsletter/deliveries",
+      "service": "domain",
+      "fields": "project_id:int:required,campaign_id:int:required,subscriber_id:int:required,email:string:required,status:enum:required:pending|sent|failed,attempts:int:required,last_error:text,sent_at:datetime",
+      "ui_mode": "readonly"
+    }
+  ],
+  "admin_sidebar": [
+    {
+      "module": "NewsletterProjects",
+      "label": "Newsletter.sidebar_label",
+      "icon": "mail",
+      "permission": "projects.read",
+      "items": ["Project", "Subscriber", "Campaign", "Delivery"]
+    }
+  ],
+  "public_endpoints": [
+    "/api/v1/newsletter/subscribers",
+    "/api/v1/newsletter/subscribers/confirm/*",
+    "/api/v1/newsletter/subscribers/unsubscribe"
+  ]
+}
