@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Newsletter;
 
+use App\DTO\Response\Newsletter\CampaignStatsResponseDTO;
 use App\Entities\CampaignEntity;
 use App\Interfaces\Newsletter\CampaignServiceInterface;
 use dcardenasl\Ci4ApiCore\Dto\DataTransferObjectInterface;
@@ -123,6 +124,43 @@ class CampaignService extends BaseCrudService implements CampaignServiceInterfac
         });
     }
 
+    public function stats(int $id, ?SecurityContext $context = null): DataTransferObjectInterface
+    {
+        $campaign = $this->repository->find($id);
+        if ($campaign === null) {
+            throw new NotFoundException(lang('Api.resourceNotFound'));
+        }
+
+        $deliveryModel = model(\App\Models\DeliveryModel::class);
+
+        $totalDeliveries = (int) $deliveryModel->where('campaign_id', $id)->countAllResults();
+        $sentCount = (int) $deliveryModel->where('campaign_id', $id)->where('status', 'sent')->countAllResults();
+        $failedCount = (int) $deliveryModel->where('campaign_id', $id)->where('status', 'failed')->countAllResults();
+        $openedCount = (int) $deliveryModel->where('campaign_id', $id)->where('opened_at IS NOT NULL', null, false)->countAllResults();
+        $clickedCount = (int) $deliveryModel->where('campaign_id', $id)->where('clicked_at IS NOT NULL', null, false)->countAllResults();
+
+        $bouncedCount = (int) $deliveryModel->builder()
+            ->join('subscribers', 'subscribers.id = deliveries.subscriber_id', 'left')
+            ->where('deliveries.campaign_id', $id)
+            ->where('subscribers.status', 'bounced')
+            ->countAllResults();
+
+        $openRate = $sentCount > 0 ? round(($openedCount / $sentCount) * 100, 1) : 0.0;
+        $clickRate = $sentCount > 0 ? round(($clickedCount / $sentCount) * 100, 1) : 0.0;
+
+        return new CampaignStatsResponseDTO(
+            campaign_id: (int) $campaign->id,
+            total_deliveries: $totalDeliveries,
+            sent_count: $sentCount,
+            failed_count: $failedCount,
+            bounced_count: $bouncedCount,
+            opened_count: $openedCount,
+            clicked_count: $clickedCount,
+            open_rate: $openRate,
+            click_rate: $clickRate,
+        );
+    }
+
     public function cancel(int $id, ?SecurityContext $context = null): DataTransferObjectInterface
     {
         return $this->wrapInTransaction(function () use ($id) {
@@ -151,5 +189,4 @@ class CampaignService extends BaseCrudService implements CampaignServiceInterfac
             return $this->responseMapper->map($updated);
         });
     }
-
 }

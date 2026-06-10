@@ -37,4 +37,6 @@ return [
 
     // Newsletter subscriber rule messages
     'already_subscribed' => 'The email address is already subscribed to this project.',
+    'import_rows_required' => 'The import requires at least one row.',
+    'import_rows_limit' => 'The import accepts at most {0} rows per request.',
 ];

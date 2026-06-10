@@ -28,6 +28,7 @@ $routes->group('newsletter', ['namespace' => '\App\Controllers\Api\V1\Newsletter
             $routes->get('subscribers/(:num)', 'SubscriberController::show/$1');
         });
         $routes->group('', ['filter' => 'permission:newsletter.subscribers.write'], function ($routes): void {
+            $routes->post('subscribers/import', 'SubscriberController::import');
             $routes->put('subscribers/(:num)', 'SubscriberController::update/$1');
         });
         $routes->group('', ['filter' => 'permission:newsletter.subscribers.delete'], function ($routes): void {
@@ -36,6 +37,7 @@ $routes->group('newsletter', ['namespace' => '\App\Controllers\Api\V1\Newsletter
         $routes->group('', ['filter' => 'permission:newsletter.campaigns.read'], function ($routes): void {
             $routes->get('campaigns', 'CampaignController::index');
             $routes->get('campaigns/(:num)', 'CampaignController::show/$1');
+            $routes->get('campaigns/(:num)/stats', 'CampaignController::stats/$1');
         });
         $routes->group('', ['filter' => 'permission:newsletter.campaigns.write'], function ($routes): void {
             $routes->post('campaigns', 'CampaignController::create');

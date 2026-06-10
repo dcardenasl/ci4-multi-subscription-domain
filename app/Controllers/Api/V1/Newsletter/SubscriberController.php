@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers\Api\V1\Newsletter;
 
 use App\DTO\Request\Newsletter\PublicSubscribeRequestDTO;
+use App\DTO\Request\Newsletter\SubscriberImportRequestDTO;
 use App\DTO\Request\Newsletter\SubscriberIndexRequestDTO;
 use App\DTO\Request\Newsletter\SubscriberUpdateRequestDTO;
 use App\DTO\Request\Newsletter\UnsubscribeRequestDTO;
@@ -40,6 +41,20 @@ class SubscriberController extends ApiController
                 return $this->subscriberService->index($dto, $context);
             },
             SubscriberIndexRequestDTO::class
+        );
+    }
+
+    public function import(): ResponseInterface
+    {
+        return $this->handleRequest(
+            function (SubscriberImportRequestDTO $dto, SecurityContext $context): mixed {
+                if (! $context->hasPermission('newsletter.subscribers.write')) {
+                    throw new \dcardenasl\Ci4ApiCore\Exceptions\AuthorizationException(lang('Api.forbidden'));
+                }
+
+                return $this->subscriberService->import($dto, $context);
+            },
+            SubscriberImportRequestDTO::class
         );
     }
 

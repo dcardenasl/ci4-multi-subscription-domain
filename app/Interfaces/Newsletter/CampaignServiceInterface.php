@@ -17,4 +17,9 @@ interface CampaignServiceInterface extends CrudServiceContract
      * Cancel the campaign (draft|scheduled -> cancelled)
      */
     public function cancel(int $id, ?\dcardenasl\Ci4ApiCore\Dto\SecurityContext $context = null): \dcardenasl\Ci4ApiCore\Dto\DataTransferObjectInterface;
+
+    /**
+     * Campaign delivery statistics
+     */
+    public function stats(int $id, ?\dcardenasl\Ci4ApiCore\Dto\SecurityContext $context = null): \dcardenasl\Ci4ApiCore\Dto\DataTransferObjectInterface;
 }

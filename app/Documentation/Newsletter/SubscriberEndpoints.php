@@ -56,6 +56,28 @@ class SubscriberEndpoints
     {
     }
 
+    #[OA\Post(
+        path: '/api/v1/newsletter/subscribers/import',
+        tags: ['Newsletter'],
+        summary: 'Bulk import Subscribers into a project',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/SubscriberImportRequest')
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Import processed (per-row results in body)',
+                content: new OA\JsonContent(ref: '#/components/schemas/SubscriberImportResult')
+            ),
+            new OA\Response(response: 404, description: 'Project not found'),
+            new OA\Response(response: 422, description: 'Validation error')
+        ]
+    )]
+    public function import(): void
+    {
+    }
+
     #[OA\Get(
         path: '/api/v1/newsletter/subscribers/{id}',
         tags: ['Newsletter'],

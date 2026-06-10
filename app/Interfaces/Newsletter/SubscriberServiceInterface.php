@@ -12,6 +12,8 @@ interface SubscriberServiceInterface extends CrudServiceContract
 {
     public function subscribe(DataTransferObjectInterface $dto, ?SecurityContext $context = null): DataTransferObjectInterface;
 
+    public function import(DataTransferObjectInterface $dto, ?SecurityContext $context = null): DataTransferObjectInterface;
+
     public function confirm(string $token, ?SecurityContext $context = null): DataTransferObjectInterface;
 
     public function unsubscribe(DataTransferObjectInterface $dto, ?SecurityContext $context = null): DataTransferObjectInterface;

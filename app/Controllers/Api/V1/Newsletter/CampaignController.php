@@ -79,6 +79,19 @@ class CampaignController extends ApiController
         );
     }
 
+    public function stats(int $id): ResponseInterface
+    {
+        return $this->handleRequest(
+            function (array $dto, SecurityContext $context) use ($id): mixed {
+                if (! $context->hasPermission('newsletter.campaigns.read')) {
+                    throw new \dcardenasl\Ci4ApiCore\Exceptions\AuthorizationException(lang('Api.forbidden'));
+                }
+
+                return $this->campaignService->stats($id, $context);
+            }
+        );
+    }
+
     public function delete(int $id): ResponseInterface
     {
         return $this->handleRequest(

@@ -37,4 +37,6 @@ return [
 
     // Mensajes de regla de suscriptor newsletter
     'already_subscribed' => 'La dirección de correo ya está suscrita a este proyecto.',
+    'import_rows_required' => 'La importación requiere al menos una fila.',
+    'import_rows_limit' => 'La importación acepta como máximo {0} filas por solicitud.',
 ];
