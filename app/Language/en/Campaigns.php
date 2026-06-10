@@ -7,6 +7,8 @@ return [
     'update_success' => 'Campaign updated successfully.',
     'delete_success' => 'Campaign deleted successfully.',
     'not_found'      => 'Campaign not found.',
+    'invalid_status_for_dispatch' => 'Campaign status must be draft or scheduled to dispatch.',
+    'invalid_status_for_cancel'   => 'Campaign status must be draft or scheduled to cancel.',
     'fields'         => [
         'project_id' => 'Project',
         'project_id_placeholder' => 'Enter Project',

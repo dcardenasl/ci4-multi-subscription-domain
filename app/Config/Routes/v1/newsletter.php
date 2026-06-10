@@ -40,6 +40,8 @@ $routes->group('newsletter', ['namespace' => '\App\Controllers\Api\V1\Newsletter
         $routes->group('', ['filter' => 'permission:newsletter.campaigns.write'], function ($routes): void {
             $routes->post('campaigns', 'CampaignController::create');
             $routes->put('campaigns/(:num)', 'CampaignController::update/$1');
+            $routes->post('campaigns/(:num)/dispatch', 'CampaignController::dispatch/$1');
+            $routes->post('campaigns/(:num)/cancel', 'CampaignController::cancel/$1');
         });
         $routes->group('', ['filter' => 'permission:newsletter.campaigns.delete'], function ($routes): void {
             $routes->delete('campaigns/(:num)', 'CampaignController::delete/$1');

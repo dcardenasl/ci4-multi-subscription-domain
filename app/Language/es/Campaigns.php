@@ -7,6 +7,8 @@ return [
     'update_success' => 'Campaign actualizado(a) exitosamente.',
     'delete_success' => 'Campaign eliminado(a) exitosamente.',
     'not_found'      => 'Campaign no encontrado(a).',
+    'invalid_status_for_dispatch' => 'El estado de la campaña debe ser borrador o programada para poder enviarse.',
+    'invalid_status_for_cancel'   => 'El estado de la campaña debe ser borrador o programada para poder cancelarse.',
     'fields'         => [
         'project_id' => 'Project',
         'project_id_placeholder' => 'Ingresa Project',

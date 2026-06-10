@@ -90,4 +90,28 @@ class CampaignController extends ApiController
             }
         );
     }
+
+    public function dispatch(int $id): ResponseInterface
+    {
+        return $this->handleRequest(
+            function (array $dto, SecurityContext $context) use ($id): mixed {
+                if (!$context->hasPermission('newsletter.campaigns.write')) {
+                    throw new \dcardenasl\Ci4ApiCore\Exceptions\AuthorizationException(lang('Api.forbidden'));
+                }
+                return $this->campaignService->dispatch($id, $context);
+            }
+        );
+    }
+
+    public function cancel(int $id): ResponseInterface
+    {
+        return $this->handleRequest(
+            function (array $dto, SecurityContext $context) use ($id): mixed {
+                if (!$context->hasPermission('newsletter.campaigns.write')) {
+                    throw new \dcardenasl\Ci4ApiCore\Exceptions\AuthorizationException(lang('Api.forbidden'));
+                }
+                return $this->campaignService->cancel($id, $context);
+            }
+        );
+    }
 }
