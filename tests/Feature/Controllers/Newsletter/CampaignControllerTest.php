@@ -39,4 +39,11 @@ final class CampaignControllerTest extends CIUnitTestCase
 
         $result->assertStatus(401);
     }
+
+    public function testStatsNotFound(): void
+    {
+        $result = $this->get('/api/v1/newsletter/campaigns/99999/stats');
+
+        $result->assertStatus(401);
+    }
 }

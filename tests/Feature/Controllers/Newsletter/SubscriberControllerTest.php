@@ -46,4 +46,11 @@ final class SubscriberControllerTest extends CIUnitTestCase
 
         $result->assertStatus(401);
     }
+
+    public function testImportRequiresAuth(): void
+    {
+        $result = $this->post('/api/v1/newsletter/subscribers/import', []);
+
+        $result->assertStatus(401);
+    }
 }

@@ -86,6 +86,32 @@ final class CampaignServiceTest extends CIUnitTestCase
         ]);
     }
 
+    private function createDelivery(
+        int $projectId,
+        int $campaignId,
+        int $subscriberId,
+        string $email,
+        string $status = 'sent',
+        ?string $openedAt = null,
+        ?string $clickedAt = null,
+    ): int {
+        return (int) model(DeliveryModel::class)->insert([
+            'project_id' => $projectId,
+            'campaign_id' => $campaignId,
+            'subscriber_id' => $subscriberId,
+            'email' => $email,
+            'status' => $status,
+            'attempts' => 1,
+            'last_error' => '',
+            'provider_message_id' => '',
+            'delivery_token' => bin2hex(random_bytes(16)),
+            'opened_at' => $openedAt,
+            'clicked_at' => $clickedAt,
+            'clicks_count' => $clickedAt !== null ? 1 : 0,
+            'sent_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
     public function testServiceImplementsItsInterface(): void
     {
         $this->assertInstanceOf(CampaignServiceInterface::class, $this->service);
@@ -149,5 +175,33 @@ final class CampaignServiceTest extends CIUnitTestCase
 
         $this->expectException(ValidationException::class);
         $this->service->cancel($campaignId);
+    }
+
+    public function testStatsAggregatesDeliveryMetrics(): void
+    {
+        $projectId = $this->createProject();
+        $campaignId = $this->createCampaign($projectId, 'sent');
+
+        $subscriberA = $this->createSubscriber($projectId, 'a@example.com', 'confirmed');
+        $subscriberB = $this->createSubscriber($projectId, 'b@example.com', 'confirmed');
+        $subscriberC = $this->createSubscriber($projectId, 'c@example.com', 'confirmed');
+        $subscriberD = $this->createSubscriber($projectId, 'd@example.com', 'bounced');
+
+        $this->createDelivery($projectId, $campaignId, $subscriberA, 'a@example.com', 'sent', date('Y-m-d H:i:s'), date('Y-m-d H:i:s'));
+        $this->createDelivery($projectId, $campaignId, $subscriberB, 'b@example.com', 'sent', date('Y-m-d H:i:s'), null);
+        $this->createDelivery($projectId, $campaignId, $subscriberC, 'c@example.com', 'failed', null, null);
+        $this->createDelivery($projectId, $campaignId, $subscriberD, 'd@example.com', 'sent', null, null);
+
+        $result = $this->service->stats($campaignId);
+
+        $this->assertSame($campaignId, $result->campaign_id);
+        $this->assertSame(4, $result->total_deliveries);
+        $this->assertSame(3, $result->sent_count);
+        $this->assertSame(1, $result->failed_count);
+        $this->assertSame(1, $result->bounced_count);
+        $this->assertSame(2, $result->opened_count);
+        $this->assertSame(1, $result->clicked_count);
+        $this->assertSame(66.7, $result->open_rate);
+        $this->assertSame(33.3, $result->click_rate);
     }
 }
