@@ -82,7 +82,7 @@ class SendCampaignJob extends Job
             if (!empty($delivery->delivery_token)) {
                 $htmlBody = preg_replace_callback('/href="([^"]+)"/i', function ($matches) use ($bffUrl, $delivery) {
                     $url = $matches[1];
-                    if (preg_match('/^https?:\/\//i', $url) && !str_contains($url, '/unsubscribe/')) {
+                    if (preg_match('/^https?:\/\//i', $url) && !str_contains($url, '/unsubscribe')) {
                         return 'href="' . $bffUrl . '/api/v1/newsletter/track/click/' . $delivery->delivery_token . '?url=' . urlencode($url) . '"';
                     }
                     return $matches[0];

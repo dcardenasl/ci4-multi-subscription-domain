@@ -20,9 +20,13 @@ class Project extends BaseConfig
     public string $version = '1.2.1';
     public string $bffUrl = 'http://localhost:8088';
 
+    /** Public landing base URL — confirm/unsubscribe links in emails land here. */
+    public string $landingUrl = 'http://localhost:8084';
+
     public function __construct()
     {
         parent::__construct();
-        $this->bffUrl = env('BFF_URL', 'http://localhost:8088');
+        $this->bffUrl     = env('BFF_URL', 'http://localhost:8088');
+        $this->landingUrl = rtrim((string) env('LANDING_URL', 'http://localhost:8084'), '/');
     }
 }

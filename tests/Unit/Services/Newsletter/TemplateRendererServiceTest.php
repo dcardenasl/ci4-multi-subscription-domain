@@ -33,8 +33,8 @@ final class TemplateRendererServiceTest extends CIUnitTestCase
         $template = "Hello {{first_name}}! Welcome to {{project_name}}. Confirm here: {{confirm_url}} or unsubscribe here: {{unsubscribe_url}}. Your email is {{email}}.";
         $rendered = $renderer->render($template, $project, $subscriber);
 
-        $bffUrl = env('BFF_URL', 'http://localhost:8088');
-        $expected = "Hello Jane! Welcome to My Test Project. Confirm here: {$bffUrl}/api/v1/newsletter/subscribers/confirm/conf123 or unsubscribe here: {$bffUrl}/api/v1/newsletter/subscribers/unsubscribe/unsub456. Your email is jane.doe@example.com.";
+        $landingUrl = config('Project')->landingUrl;
+        $expected = "Hello Jane! Welcome to My Test Project. Confirm here: {$landingUrl}/confirm/conf123 or unsubscribe here: {$landingUrl}/unsubscribe?token=unsub456. Your email is jane.doe@example.com.";
 
         $this->assertSame($expected, $rendered);
     }

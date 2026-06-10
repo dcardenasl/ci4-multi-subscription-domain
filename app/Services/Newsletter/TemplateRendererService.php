@@ -15,14 +15,14 @@ class TemplateRendererService
     /** @param array<string, string> $additionalReplacements */
     public function render(string $content, ProjectEntity $project, SubscriberEntity $subscriber, array $additionalReplacements = []): string
     {
-        $bffUrl = config('Project')->bffUrl;
+        $landingUrl = config('Project')->landingUrl;
 
         $confirmUrl = !empty($subscriber->confirm_token)
-            ? "{$bffUrl}/api/v1/newsletter/subscribers/confirm/" . $subscriber->confirm_token
+            ? "{$landingUrl}/confirm/" . $subscriber->confirm_token
             : '';
 
         $unsubscribeUrl = !empty($subscriber->unsubscribe_token)
-            ? "{$bffUrl}/api/v1/newsletter/subscribers/unsubscribe/" . $subscriber->unsubscribe_token
+            ? "{$landingUrl}/unsubscribe?token=" . $subscriber->unsubscribe_token
             : '';
 
         $firstName = !empty($subscriber->first_name)

@@ -47,8 +47,8 @@ class SendDoubleOptInEmailJob extends Job
 
         $fromEmail = !empty($project->smtp_from_email) ? $project->smtp_from_email : env('EMAIL_FROM_EMAIL', 'noreply@multisubscription.local');
         $fromName = !empty($project->smtp_from_name) ? $project->smtp_from_name : env('EMAIL_FROM_NAME', $project->name);
-        $bffUrl = env('BFF_URL', 'http://localhost:8088');
-        $confirmUrl = "{$bffUrl}/api/v1/newsletter/subscribers/confirm/" . $subscriber->confirm_token;
+        $landingUrl = config('Project')->landingUrl;
+        $confirmUrl = "{$landingUrl}/confirm/" . $subscriber->confirm_token;
 
         $subscriberLocale = !empty($subscriber->locale) ? $subscriber->locale : ($project->locale_default ?? 'en');
 
