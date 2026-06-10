@@ -16,6 +16,7 @@ return [
     'authRequired' => 'Authentication required.',
     'insufficientPermissions' => 'Insufficient permissions for this action.',
     'invalidToken' => 'Invalid or expired authentication token.',
+    'invalidWebhookSignature' => 'Invalid webhook signature.',
     'hubUnreachable' => 'Authentication service is unavailable.',
     'serverError' => 'An internal server error occurred.',
     'tooManyRequests' => 'Too many requests.',

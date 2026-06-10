@@ -16,6 +16,7 @@ return [
     'authRequired' => 'Se requiere autenticación.',
     'insufficientPermissions' => 'Permisos insuficientes para esta acción.',
     'invalidToken' => 'Token de autenticación inválido o expirado.',
+    'invalidWebhookSignature' => 'Firma de webhook inválida.',
     'hubUnreachable' => 'El servicio de autenticación no está disponible.',
     'serverError' => 'Ha ocurrido un error interno en el servidor.',
     'tooManyRequests' => 'Demasiadas solicitudes.',

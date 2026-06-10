@@ -9,6 +9,8 @@ use App\Models\SubscriberModel;
 use CodeIgniter\Test\CIUnitTestCase;
 use CodeIgniter\Test\DatabaseTestTrait;
 use CodeIgniter\Test\FeatureTestTrait;
+use Config\NewsletterWebhooks;
+use Config\Services;
 
 /**
  * Feature test for WebhookController.
@@ -24,6 +26,28 @@ final class WebhookControllerTest extends CIUnitTestCase
     protected $migrateOnce = true;
     protected $refresh     = true;
     protected $namespace   = 'App';
+
+    private const WEBHOOK_TOKEN = 'test-webhook-token';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $config = config(NewsletterWebhooks::class);
+        $config->sesSharedToken      = self::WEBHOOK_TOKEN;
+        $config->sendgridPublicKey   = '';
+        $config->sendgridSharedToken = self::WEBHOOK_TOKEN;
+        $config->mailgunSigningKey   = '';
+        $config->mailgunSharedToken  = self::WEBHOOK_TOKEN;
+
+        Services::resetSingle('webhookSignatureService');
+    }
+
+    /** @return array<string, string> */
+    private function tokenHeader(): array
+    {
+        return ['X-Webhook-Token' => self::WEBHOOK_TOKEN];
+    }
 
     private function createProjectAndSubscriber(string $email, string $status = 'confirmed'): int
     {
@@ -76,7 +100,7 @@ final class WebhookControllerTest extends CIUnitTestCase
             ]
         ];
 
-        $response = $this->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/ses');
+        $response = $this->withHeaders($this->tokenHeader())->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/ses');
 
         $response->assertStatus(200);
 
@@ -99,7 +123,7 @@ final class WebhookControllerTest extends CIUnitTestCase
             ]
         ];
 
-        $response = $this->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/ses');
+        $response = $this->withHeaders($this->tokenHeader())->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/ses');
 
         $response->assertStatus(200);
 
@@ -115,7 +139,7 @@ final class WebhookControllerTest extends CIUnitTestCase
             'SubscribeURL' => 'https://example.com/confirm-sns'
         ];
 
-        $response = $this->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/ses');
+        $response = $this->withHeaders($this->tokenHeader())->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/ses');
 
         $response->assertStatus(200);
         $this->assertStringContainsString('Subscription confirmed', $response->getJSON() ?: '');
@@ -140,7 +164,7 @@ final class WebhookControllerTest extends CIUnitTestCase
             ]
         ];
 
-        $response = $this->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/sendgrid');
+        $response = $this->withHeaders($this->tokenHeader())->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/sendgrid');
 
         $response->assertStatus(200);
 
@@ -164,7 +188,7 @@ final class WebhookControllerTest extends CIUnitTestCase
             ]
         ];
 
-        $response = $this->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/mailgun');
+        $response = $this->withHeaders($this->tokenHeader())->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/mailgun');
 
         $response->assertStatus(200);
 
@@ -184,11 +208,45 @@ final class WebhookControllerTest extends CIUnitTestCase
             ]
         ];
 
-        $response = $this->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/mailgun');
+        $response = $this->withHeaders($this->tokenHeader())->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/mailgun');
 
         $response->assertStatus(200);
 
         $subscriber = model(SubscriberModel::class)->find($subscriberId);
         $this->assertEquals('unsubscribed', $subscriber->status);
+    }
+
+    public function testWebhookWithoutTokenIsRejected(): void
+    {
+        $email = 'unauthorized@example.com';
+        $subscriberId = $this->createProjectAndSubscriber($email);
+
+        $payload = [
+            'notificationType' => 'Bounce',
+            'bounce' => [
+                'bounceType' => 'Permanent',
+                'bouncedRecipients' => [
+                    ['emailAddress' => $email]
+                ]
+            ]
+        ];
+
+        $response = $this->withBody(json_encode($payload))->post('/api/v1/newsletter/webhooks/ses');
+
+        $response->assertStatus(401);
+
+        $subscriber = model(SubscriberModel::class)->find($subscriberId);
+        $this->assertEquals('confirmed', $subscriber->status);
+    }
+
+    public function testWebhookWithWrongTokenIsRejected(): void
+    {
+        $payload = ['event-data' => ['event' => 'complained', 'recipient' => 'x@example.com']];
+
+        $response = $this->withHeaders(['X-Webhook-Token' => 'wrong-token'])
+            ->withBody(json_encode($payload))
+            ->post('/api/v1/newsletter/webhooks/mailgun');
+
+        $response->assertStatus(401);
     }
 }

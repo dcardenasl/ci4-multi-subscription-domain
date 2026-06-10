@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controllers\Api\V1\Newsletter;
 
+use App\Services\Newsletter\WebhookSignatureService;
+use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\ResponseInterface;
 use Config\Services;
+use dcardenasl\Ci4ApiCore\Exceptions\AuthenticationException;
 use dcardenasl\Ci4ApiCore\Http\ApiController;
 
 class WebhookController extends ApiController
@@ -13,6 +16,18 @@ class WebhookController extends ApiController
     protected function resolveDefaultService(): object
     {
         return Services::subscriberService();
+    }
+
+    private function signatureService(): WebhookSignatureService
+    {
+        return Services::webhookSignatureService();
+    }
+
+    private function incomingRequest(): IncomingRequest
+    {
+        assert($this->request instanceof IncomingRequest);
+
+        return $this->request;
     }
 
     public function ses(): ResponseInterface
@@ -23,6 +38,10 @@ class WebhookController extends ApiController
 
             if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
                 return ['success' => false, 'message' => 'Invalid JSON payload'];
+            }
+
+            if (! $this->signatureService()->verifySes($this->incomingRequest(), $data)) {
+                throw new AuthenticationException(lang('Api.invalidWebhookSignature'));
             }
 
             // AWS SNS Subscription Confirmation
@@ -79,6 +98,11 @@ class WebhookController extends ApiController
     {
         return $this->handleRequest(function (): array {
             $rawBody = $this->request->getBody() ?? '';
+
+            if (! $this->signatureService()->verifySendgrid($this->incomingRequest(), $rawBody)) {
+                throw new AuthenticationException(lang('Api.invalidWebhookSignature'));
+            }
+
             $events = json_decode($rawBody, true);
 
             if (json_last_error() !== JSON_ERROR_NONE || !is_array($events)) {
@@ -114,6 +138,10 @@ class WebhookController extends ApiController
 
             if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
                 return ['success' => false, 'message' => 'Invalid JSON payload'];
+            }
+
+            if (! $this->signatureService()->verifyMailgun($this->incomingRequest(), $data)) {
+                throw new AuthenticationException(lang('Api.invalidWebhookSignature'));
             }
 
             $eventData = $data['event-data'] ?? [];

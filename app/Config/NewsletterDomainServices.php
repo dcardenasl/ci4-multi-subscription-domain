@@ -6,6 +6,13 @@ namespace Config;
 
 trait NewsletterDomainServices
 {
+    public static function webhookSignatureService(bool $getShared = true): \App\Services\Newsletter\WebhookSignatureService
+    {
+        if ($getShared) {
+            return static::getSharedInstance('webhookSignatureService');
+        }
+        return new \App\Services\Newsletter\WebhookSignatureService(config(\Config\NewsletterWebhooks::class));
+    }
     public static function projectResponseMapper(bool $getShared = true): \dcardenasl\Ci4ApiCore\Mappers\ResponseMapperInterface
     {
         if ($getShared) {

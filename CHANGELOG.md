@@ -8,5 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **`WebhookSignatureService`** — verifies provider signatures on inbound newsletter webhooks (SendGrid ECDSA, generic HMAC, shared-token fallback) driven by the new `Config\NewsletterWebhooks`; `WebhookController` rejects unsigned or invalid payloads.
 - **`SyncPermissions` command** — auto-clears local and admin caches after sync in development environments (DX improvement).
 - **`SyncPermissions` command** — auto-mints a temporary superadmin token from the Hub database in development, so `--admin-token` is no longer required for local runs when `hub.adminToken` is not set.
