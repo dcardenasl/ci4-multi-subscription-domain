@@ -5,21 +5,149 @@ declare(strict_types=1);
 namespace Tests\Unit\Services\Newsletter;
 
 use App\Interfaces\Newsletter\CampaignServiceInterface;
+use App\Models\CampaignModel;
+use App\Models\DeliveryModel;
+use App\Models\ProjectModel;
+use App\Models\SubscriberModel;
 use CodeIgniter\Test\CIUnitTestCase;
+use CodeIgniter\Test\DatabaseTestTrait;
 use Config\Services;
+use dcardenasl\Ci4ApiCore\Exceptions\ValidationException;
 
 /**
- * Smoke tests for CampaignService. Extend with domain-specific assertions
- * as business rules accumulate in the service.
+ * Unit/Integration tests for CampaignService dispatch and cancel features.
  *
  * @internal
  */
 final class CampaignServiceTest extends CIUnitTestCase
 {
+    use DatabaseTestTrait;
+
+    protected $migrate = true;
+    protected $namespace = 'App';
+
+    private CampaignServiceInterface $service;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->service = Services::campaignService(false);
+    }
+
+    private function createProject(): int
+    {
+        return (int) model(ProjectModel::class)->insert([
+            'name' => 'Test Project',
+            'slug' => 'test-project',
+            'project_key' => 'test-key',
+            'is_active' => true,
+            'smtp_provider' => '',
+            'smtp_host' => '',
+            'smtp_port' => 0,
+            'smtp_user' => '',
+            'smtp_pass_encrypted' => '',
+            'smtp_crypto' => '',
+            'smtp_from_name' => '',
+            'smtp_from_email' => '',
+            'double_opt_in_enabled' => false,
+            'locale_default' => 'en',
+            'recaptcha_site_key' => '',
+            'recaptcha_secret_key' => '',
+        ]);
+    }
+
+    private function createSubscriber(int $projectId, string $email, string $status = 'confirmed'): int
+    {
+        return (int) model(SubscriberModel::class)->insert([
+            'project_id' => $projectId,
+            'email' => $email,
+            'status' => $status,
+            'confirm_token' => '',
+            'unsubscribe_token' => bin2hex(random_bytes(16)),
+            'invitation_code' => '',
+            'confirmed_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    private function createCampaign(int $projectId, string $status = 'draft'): int
+    {
+        return (int) model(CampaignModel::class)->insert([
+            'project_id' => $projectId,
+            'name' => 'Weekly News',
+            'subject' => 'Check this out!',
+            'html_body' => 'Hello!',
+            'text_body' => 'Hello text',
+            'status' => $status,
+            'scheduled_at' => date('Y-m-d H:i:s'),
+            'send_started_at' => '1000-01-01 00:00:00',
+            'sent_at' => '1000-01-01 00:00:00',
+            'failed_at' => '1000-01-01 00:00:00',
+            'failure_reason' => '',
+        ]);
+    }
+
     public function testServiceImplementsItsInterface(): void
     {
-        $service = Services::campaignService(false);
+        $this->assertInstanceOf(CampaignServiceInterface::class, $this->service);
+    }
 
-        $this->assertInstanceOf(CampaignServiceInterface::class, $service);
+    public function testDispatchSuccessFromDraft(): void
+    {
+        $projectId = $this->createProject();
+        $this->createSubscriber($projectId, 'sub1@example.com', 'confirmed');
+        $this->createSubscriber($projectId, 'sub2@example.com', 'confirmed');
+        $this->createSubscriber($projectId, 'sub3@example.com', 'pending'); // should NOT receive campaign
+
+        $campaignId = $this->createCampaign($projectId, 'draft');
+
+        $result = $this->service->dispatch($campaignId);
+
+        $this->assertEquals('sent', $result->status);
+
+        // Verify campaign model status in DB
+        $campaign = model(CampaignModel::class)->find($campaignId);
+        $this->assertEquals('sent', $campaign->status);
+        $this->assertNotEmpty($campaign->send_started_at);
+        $this->assertNotEmpty($campaign->sent_at);
+
+        // Verify deliveries created
+        $deliveries = model(DeliveryModel::class)->where('campaign_id', $campaignId)->findAll();
+        $this->assertCount(2, $deliveries);
+
+        $emails = array_map(fn ($d) => $d->email, $deliveries);
+        $this->assertContains('sub1@example.com', $emails);
+        $this->assertContains('sub2@example.com', $emails);
+        $this->assertNotContains('sub3@example.com', $emails);
+    }
+
+    public function testDispatchFailsForSentCampaign(): void
+    {
+        $projectId = $this->createProject();
+        $campaignId = $this->createCampaign($projectId, 'sent');
+
+        $this->expectException(ValidationException::class);
+        $this->service->dispatch($campaignId);
+    }
+
+    public function testCancelSuccessFromScheduled(): void
+    {
+        $projectId = $this->createProject();
+        $campaignId = $this->createCampaign($projectId, 'scheduled');
+
+        $result = $this->service->cancel($campaignId);
+
+        $this->assertEquals('cancelled', $result->status);
+
+        $campaign = model(CampaignModel::class)->find($campaignId);
+        $this->assertEquals('cancelled', $campaign->status);
+    }
+
+    public function testCancelFailsForSentCampaign(): void
+    {
+        $projectId = $this->createProject();
+        $campaignId = $this->createCampaign($projectId, 'sent');
+
+        $this->expectException(ValidationException::class);
+        $this->service->cancel($campaignId);
     }
 }
