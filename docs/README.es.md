@@ -82,6 +82,7 @@ Si nunca has scaffoldeado un CRUD en este kit, sigue este orden:
 - [02 — Recuperación de migración fallida](runbooks/02-failed-migration-recovery.es.md)
 - [03 — Upgrade CI4 minor](runbooks/03-upgrade-ci4-minor.es.md)
 - [04 — Incidente: token leak](runbooks/04-incident-token-leak.es.md)
+- [05 — Workers de cola y dispatch de campañas](runbooks/05-queue-operations.es.md)
 
 ## 🔍 Auditorías
 

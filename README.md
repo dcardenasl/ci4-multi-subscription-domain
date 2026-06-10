@@ -87,6 +87,14 @@ This is a domain app, not the hub. The following are **out of scope** here and l
 # Dev server
 php spark serve --port 8090
 
+# Queue workers for newsletter jobs
+php spark queue:work --queue=emails
+php spark queue:work --queue=logs
+php spark queue:work --queue=audit
+
+# Run the campaign dispatcher for scheduled newsletters
+php spark campaign:dispatch
+
 # Database
 php spark migrate                    # Local migrations only — never touches the hub DB
 php spark tests:prepare-db           # Sync the test DB before feature tests

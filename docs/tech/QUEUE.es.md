@@ -37,6 +37,7 @@ Notas:
 - La implementación actual de `QueueManager` usa tablas de **database**.
 - Si pones `QUEUE_DRIVER=redis`, seguirá usando database a menos que se extienda el manager.
 - En `ENVIRONMENT=testing`, la conexión de base de datos de cola usa `tests` por defecto (se puede sobrescribir con `QUEUE_DATABASE_CONNECTION`).
+- La política activa de reintentos es `QUEUE_MAX_ATTEMPTS=3` y `QUEUE_RETRY_AFTER=90`; los jobs relanzan la excepción en fallo para que el queue manager los reencole hasta agotar el límite.
 
 ## Migraciones requeridas
 
@@ -74,6 +75,12 @@ Procesar jobs de auditoria continuamente:
 
 ```
 php spark queue:work --queue=audit
+```
+
+Ejecutar el dispatcher de campañas programadas:
+
+```
+php spark campaign:dispatch
 ```
 
 Procesar multiples colas con workers separados (recomendado):
@@ -114,3 +121,17 @@ Desarrollo:
 
 Producción:
 - Ejecutar workers de cola bajo un supervisor (systemd, supervisor, PM2, etc.) para cada cola activa (`emails`, `logs`, `audit`).
+- Ejecutar `campaign:dispatch` desde cron cada minuto para que las campañas `scheduled` se encolen automáticamente.
+- Preferir un worker por cola para que los envíos lentos de email no bloqueen request logs o audit jobs.
+
+## Split operativo recomendado
+
+Desarrollo:
+- Mantener un terminal para `php spark serve --port 8090`.
+- Mantener otro para `php spark queue:work --queue=emails --once` al probar entregas.
+- Usar `php spark queue:work --queue=logs` o `--queue=audit` solo cuando haga falta verificar esos pipelines.
+
+Producción:
+- Un worker largo por cola (`emails`, `logs`, `audit`) bajo systemd, supervisor, PM2 o equivalente.
+- Un cron cada minuto para `php spark campaign:dispatch`.
+- Monitorear `failed_jobs` para jobs que agotaron `QUEUE_MAX_ATTEMPTS`; requieren revisión operativa antes de reencolar.

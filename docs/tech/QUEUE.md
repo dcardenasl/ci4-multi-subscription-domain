@@ -37,6 +37,7 @@ Notes:
 - The current `QueueManager` implementation uses **database** tables.
 - If you set `QUEUE_DRIVER=redis`, it will still use the database unless the manager is extended.
 - In `ENVIRONMENT=testing`, queue DB connection defaults to `tests` (can be overridden by `QUEUE_DATABASE_CONNECTION`).
+- The active retry policy is `QUEUE_MAX_ATTEMPTS=3` and `QUEUE_RETRY_AFTER=90`; jobs rethrow on failure so the queue manager can requeue them until the attempt cap is reached.
 
 ## Required Migrations
 
@@ -74,6 +75,12 @@ Process audit jobs continuously:
 
 ```
 php spark queue:work --queue=audit
+```
+
+Run the campaign dispatcher for scheduled newsletters:
+
+```
+php spark campaign:dispatch
 ```
 
 Process multiple queues with separate workers (recommended):
@@ -114,3 +121,17 @@ Development:
 
 Production:
 - Run queue workers under a process supervisor (systemd, supervisor, PM2, etc.) for each active queue (`emails`, `logs`, `audit`).
+- Run `campaign:dispatch` from cron every minute so `scheduled` campaigns get queued without a manual CLI run.
+- Prefer one worker per queue so slow email sends do not block request logs or audit jobs.
+
+## Recommended Operational Split
+
+Development:
+- Keep one terminal for `php spark serve --port 8090`.
+- Keep one terminal for `php spark queue:work --queue=emails --once` when testing delivery behavior.
+- Use `php spark queue:work --queue=logs` or `--queue=audit` only when you need to verify those pipelines.
+
+Production:
+- One long-running worker per queue (`emails`, `logs`, `audit`) under systemd, supervisor, PM2, or equivalent.
+- One cron entry every minute for `php spark campaign:dispatch`.
+- Monitor `failed_jobs` for jobs that exhausted `QUEUE_MAX_ATTEMPTS`; these need operator review before manual requeue.

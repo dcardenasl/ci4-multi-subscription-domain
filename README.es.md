@@ -88,6 +88,14 @@ Esto es una app de dominio, no el hub. Lo siguiente está **fuera de alcance** y
 # Servidor de desarrollo
 php spark serve --port 8090
 
+# Workers de cola para jobs de newsletter
+php spark queue:work --queue=emails
+php spark queue:work --queue=logs
+php spark queue:work --queue=audit
+
+# Ejecutar el dispatcher de campañas programadas
+php spark campaign:dispatch
+
 # Base de datos
 php spark migrate                    # Solo migraciones locales — nunca toca la BD del hub
 php spark tests:prepare-db           # Sincroniza la BD de tests antes de feature tests
