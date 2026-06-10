@@ -22,14 +22,18 @@ class CampaignModel extends BaseAuditableModel
 
     protected $allowedFields = ['project_id', 'name', 'subject', 'html_body', 'text_body', 'status', 'scheduled_at', 'send_started_at', 'sent_at', 'failed_at', 'failure_reason', 'opened_count', 'clicked_count'];
 
-    /** @var array<int, string> */
+    /**
+     * Intentionally empty — see note in SubscriberModel::$searchableFields.
+     *
+     * @var array<int, string>
+     */
     protected array $searchableFields = [];
 
     /** @var array<int, string> */
-    protected array $filterableFields = ['id'];
+    protected array $filterableFields = ['id', 'project_id', 'status'];
 
     /** @var array<int, string> */
-    protected array $sortableFields = ['id', 'created_at'];
+    protected array $sortableFields = ['id', 'name', 'subject', 'project_id', 'status', 'scheduled_at', 'created_at'];
 
     protected $validationRules = [
         'project_id' => 'required|integer',

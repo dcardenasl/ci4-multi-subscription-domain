@@ -22,21 +22,29 @@ class SubscriberModel extends BaseAuditableModel
 
     protected $allowedFields = ['project_id', 'email', 'first_name', 'locale', 'status', 'confirm_token', 'unsubscribe_token', 'invitation_code', 'confirmed_at', 'unsubscribed_at'];
 
-    /** @var array<int, string> */
+    /**
+     * Intentionally empty: core QueryBuilder search only emits MATCH/AGAINST
+     * (fulltext) and the subscribers table has no FULLTEXT index — enabling
+     * fields here would turn every search into a 500. See upstream fix note
+     * in ci4-api-core (QueryBuilder::search reads searchEnabled instead of
+     * searchUseFulltext).
+     *
+     * @var array<int, string>
+     */
     protected array $searchableFields = [];
 
     /** @var array<int, string> */
-    protected array $filterableFields = ['id'];
+    protected array $filterableFields = ['id', 'project_id', 'status'];
 
     /** @var array<int, string> */
-    protected array $sortableFields = ['id', 'created_at'];
+    protected array $sortableFields = ['id', 'email', 'project_id', 'status', 'confirmed_at', 'created_at'];
 
     protected $validationRules = [
         'project_id' => 'required|integer',
         'email' => 'required|string|max_length[255]',
         'first_name' => 'permit_empty|string|max_length[255]',
         'locale' => 'permit_empty|string|max_length[10]',
-        'status' => 'required|string|max_length[255]',
+        'status' => 'required|in_list[pending,confirmed,unsubscribed,bounced]',
         'confirm_token' => 'permit_empty|string|max_length[255]',
         'unsubscribe_token' => 'permit_empty|string|max_length[255]',
         'invitation_code' => 'permit_empty|string|max_length[255]',

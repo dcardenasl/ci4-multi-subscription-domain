@@ -18,7 +18,7 @@ readonly class SubscriberCreateRequestDTO extends BaseRequestDTO
     public ?string $first_name;
     #[OA\Property(description: 'locale', type: 'string', nullable: true)]
     public ?string $locale;
-    #[OA\Property(description: 'status', type: 'string')]
+    #[OA\Property(description: 'status', type: 'string', enum: ['pending', 'confirmed', 'unsubscribed', 'bounced'])]
     public string $status;
     #[OA\Property(description: 'confirm_token', type: 'string')]
     public string $confirm_token;
@@ -41,7 +41,7 @@ readonly class SubscriberCreateRequestDTO extends BaseRequestDTO
             'email' => 'required|string|max_length[255]',
             'first_name' => 'permit_empty|string|max_length[255]',
             'locale' => 'permit_empty|string|max_length[10]',
-            'status' => 'required|string|max_length[255]',
+            'status' => 'required|in_list[pending,confirmed,unsubscribed,bounced]',
             'confirm_token' => 'permit_empty|string|max_length[255]',
             'unsubscribe_token' => 'permit_empty|string|max_length[255]',
             'invitation_code' => 'permit_empty|string|max_length[255]',

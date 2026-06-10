@@ -25,7 +25,7 @@ final readonly class SubscriberResponseDTO implements DataTransferObjectInterfac
         public string $first_name,
         #[OA\Property(description: 'locale', type: 'string')]
         public string $locale,
-        #[OA\Property(description: 'status', type: 'string')]
+        #[OA\Property(description: 'status', type: 'string', enum: ['pending', 'confirmed', 'unsubscribed', 'bounced'])]
         public string $status,
         #[OA\Property(description: 'confirm_token', type: 'string')]
         public string $confirm_token,
