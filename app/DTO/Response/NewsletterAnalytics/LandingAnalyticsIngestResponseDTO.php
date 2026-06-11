@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\DTO\Response\NewsletterAnalytics;
 
-use dcardenasl\Ci4ApiCore\Dto\BaseResponseDTO;
+use dcardenasl\Ci4ApiCore\Dto\DataTransferObjectInterface;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(schema: 'LandingAnalyticsIngestResponse')]
-readonly class LandingAnalyticsIngestResponseDTO extends BaseResponseDTO
+readonly class LandingAnalyticsIngestResponseDTO implements DataTransferObjectInterface
 {
     public int $accepted;
     public int $rejected;
