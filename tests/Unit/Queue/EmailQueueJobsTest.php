@@ -270,7 +270,7 @@ final class EmailQueueJobsTest extends CIUnitTestCase
 
         $this->assertStringContainsString('Hola Alice', $capturedHtml);
         $landingUrl = config('Project')->landingUrl;
-        $this->assertStringContainsString("{$landingUrl}/unsubscribe?token=unsub-alice-123", $capturedHtml);
+        $this->assertStringContainsString("{$landingUrl}/es/unsubscribe?token=unsub-alice-123", $capturedHtml);
 
         $expectedTitle = lang('Subscribers.confirm_subscription_title', [], 'es');
         $this->assertStringContainsString($expectedTitle, $capturedHtml);

@@ -97,4 +97,27 @@ final class SubscriberIndexFilterTest extends CIUnitTestCase
         $byCreated = $this->indexRows(['sort' => '-created_at']);
         $this->assertCount(3, $byCreated);
     }
+
+    public function testSearchByEmailOrFirstName(): void
+    {
+        $this->db->table('subscribers')->insert([
+            'project_id' => 1,
+            'email'      => 'delta@example.test',
+            'first_name' => 'Charlie',
+            'status'     => 'confirmed',
+            'unsubscribe_token' => bin2hex(random_bytes(16)),
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        // Search by email substring (e.g. "bet")
+        $rows = $this->indexRows(['search' => 'bet']);
+        $this->assertCount(1, $rows);
+        $this->assertSame('beta@example.test', $rows[0]['email']);
+
+        // Search by first name substring (e.g. "Char")
+        $rows2 = $this->indexRows(['search' => 'Char']);
+        $this->assertCount(1, $rows2);
+        $this->assertSame('delta@example.test', $rows2[0]['email']);
+    }
 }

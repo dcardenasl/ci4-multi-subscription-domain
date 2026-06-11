@@ -27,6 +27,9 @@ class AuditableModelConventionsTest extends CIUnitTestCase
      */
     private const NON_AUDITABLE = [
         'AuditLogModel',
+        'LandingAnalyticsDailyAggregateModel',
+        'LandingAnalyticsEventModel',
+        'LandingAnalyticsSessionModel',
         'MetricModel',
         'RequestLogModel',
     ];

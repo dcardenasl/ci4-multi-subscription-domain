@@ -39,6 +39,32 @@ final class TemplateRendererServiceTest extends CIUnitTestCase
         $this->assertSame($expected, $rendered);
     }
 
+    public function testRenderReplacesPlaceholdersWithLocaleCorrectly(): void
+    {
+        $renderer = new TemplateRendererService();
+
+        $project = new ProjectEntity([
+            'name' => 'My Test Project',
+            'locale_default' => 'es',
+        ]);
+
+        $subscriber = new SubscriberEntity([
+            'email' => 'jane.doe@example.com',
+            'first_name' => 'Jane',
+            'confirm_token' => 'conf123',
+            'unsubscribe_token' => 'unsub456',
+            'locale' => 'es',
+        ]);
+
+        $template = "Confirm here: {{confirm_url}} or unsubscribe here: {{unsubscribe_url}}.";
+        $rendered = $renderer->render($template, $project, $subscriber);
+
+        $landingUrl = config('Project')->landingUrl;
+        $expected = "Confirm here: {$landingUrl}/es/confirm/conf123 or unsubscribe here: {$landingUrl}/es/unsubscribe?token=unsub456.";
+
+        $this->assertSame($expected, $rendered);
+    }
+
     public function testRenderFallbackFirstName(): void
     {
         $renderer = new TemplateRendererService();
