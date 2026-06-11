@@ -97,7 +97,7 @@ class SubscriberService extends BaseCrudService implements SubscriberServiceInte
             if ($doubleOptIn && !empty($entity->confirm_token)) {
                 service('queueManager')->push(\App\Queue\Jobs\SendDoubleOptInEmailJob::class, [
                     'subscriber_id' => $entity->id,
-                ]);
+                ], 'emails');
             }
 
             return $this->responseMapper->map($entity);

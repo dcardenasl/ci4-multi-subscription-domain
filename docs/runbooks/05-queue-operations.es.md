@@ -103,6 +103,49 @@ Ejecuta el dispatcher cada minuto para que las campañas programadas se tomen au
 5. Confirma que el delivery quedó en `sent`, o en `failed` con `last_error` útil.
 6. Si hay fallos acumulados, revisa `failed_jobs` y los logs antes de reencolar.
 
+## Smoke E2E con run id aislado
+
+Para corridas con navegador y correo real, usa un identificador único y ponlo en todos los datos creados desde la UI:
+
+```bash
+RUN_ID="e2e-$(date +%Y%m%d-%H%M%S)"
+```
+
+Convenciones recomendadas:
+
+- Campaign name: `Campaign ${RUN_ID}`
+- Campaign subject: `E2E Campaign ${RUN_ID}`
+- Subscriber email: usar una dirección controlada de la bandeja externa, y registrar el `RUN_ID` en `first_name` o en el nombre de campaña.
+- No reutilizar campañas antiguas para verificar métricas.
+
+Antes de ejecutar el worker, confirma que el flujo normal sí dejó jobs en la cola `emails`:
+
+```sql
+SELECT id, queue, attempts, reserved_at, available_at, created_at
+FROM jobs
+WHERE queue = 'emails'
+ORDER BY id DESC
+LIMIT 10;
+```
+
+Procesa la cola sin comandos temporales:
+
+```bash
+php spark queue:work --queue=emails --once
+```
+
+Para campañas, verifica únicamente las deliveries de la campaña del run:
+
+```sql
+SELECT d.id, d.email, d.status, d.attempts, d.last_error, d.sent_at
+FROM deliveries d
+JOIN campaigns c ON c.id = d.campaign_id
+WHERE c.name LIKE CONCAT('%', :run_id, '%')
+ORDER BY d.id;
+```
+
+Limpieza segura después de una corrida: elimina o archiva solo datos con el `RUN_ID` explícito. No borres por estado (`pending`, `failed`, `sent`) ni por fechas amplias, porque puedes tocar pruebas manuales no relacionadas.
+
 ## Troubleshooting
 
 - Los jobs no arrancan:
@@ -113,4 +156,3 @@ Ejecuta el dispatcher cada minuto para que las campañas programadas se tomen au
   - Lee `last_error`, corrige la causa raíz y reencola solo después de verificar la corrección.
 - Las campañas programadas no se despachan:
   - Confirma que el cron de `campaign:dispatch` está activo y que la hora del servidor es correcta.
-

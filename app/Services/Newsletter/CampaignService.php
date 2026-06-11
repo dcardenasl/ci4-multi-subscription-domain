@@ -182,7 +182,7 @@ class CampaignService extends BaseCrudService implements CampaignServiceInterfac
                     // 4. Push job to queue
                     $queueManager->push(\App\Queue\Jobs\SendCampaignJob::class, [
                         'delivery_id' => $deliveryId,
-                    ]);
+                    ], 'emails');
                 }
             }
 

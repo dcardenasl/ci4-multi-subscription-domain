@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTO\Response\Newsletter;
 
+use DateTimeInterface;
 use dcardenasl\Ci4ApiCore\Dto\DataTransferObjectInterface;
 use OpenApi\Attributes as OA;
 
@@ -51,8 +52,8 @@ final readonly class EmailTemplateResponseDTO implements DataTransferObjectInter
             html_body: (string) ($data['html_body'] ?? ''),
             text_body: (string) ($data['text_body'] ?? ''),
             type: (string) ($data['type'] ?? ''),
-            createdAt: $data['created_at'] ?? null,
-            updatedAt: $data['updated_at'] ?? null,
+            createdAt: self::nullableTimestamp($data['created_at'] ?? null),
+            updatedAt: self::nullableTimestamp($data['updated_at'] ?? null),
             translations: (function () use ($data) {
                 $t = $data['translations'] ?? null;
                 if ($t === null && isset($data['id'])) {
@@ -62,6 +63,19 @@ final readonly class EmailTemplateResponseDTO implements DataTransferObjectInter
                 return $t ?? [];
             })()
         );
+    }
+
+    private static function nullableTimestamp(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if ($value instanceof DateTimeInterface) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        return (string) $value;
     }
 
     /**

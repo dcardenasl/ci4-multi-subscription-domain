@@ -275,4 +275,58 @@ final class EmailQueueJobsTest extends CIUnitTestCase
         $expectedTitle = lang('Subscribers.confirm_subscription_title', [], 'es');
         $this->assertStringContainsString($expectedTitle, $capturedHtml);
     }
+
+    public function testSendCampaignJobRewritesTrackedLinksAndPreservesUnsubscribeUrl(): void
+    {
+        $projectId = $this->createProject();
+
+        $subscriberId = $this->createSubscriber($projectId, [
+            'status' => 'confirmed',
+            'unsubscribe_token' => 'unsub-track-123',
+        ]);
+
+        $campaignId = $this->createCampaign($projectId, [
+            'html_body' => '<a href="https://example.com/article?x=1">Read</a> <a href="{{unsubscribe_url}}">Unsubscribe</a>',
+        ]);
+
+        $deliveryModel = model(DeliveryModel::class);
+        $deliveryId = $deliveryModel->insert([
+            'project_id' => $projectId,
+            'campaign_id' => $campaignId,
+            'subscriber_id' => $subscriberId,
+            'email' => 'tracked@example.com',
+            'status' => 'pending',
+            'attempts' => 0,
+            'last_error' => '',
+            'provider_message_id' => '',
+            'delivery_token' => 'delivery-token-abc',
+            'sent_at' => '1000-01-01 00:00:00',
+        ]);
+
+        $capturedHtml = '';
+        $mockEmail = $this->getMockBuilder(Email::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockEmail->method('send')->willReturn(true);
+        $mockEmail->expects($this->once())
+            ->method('setMessage')
+            ->with($this->callback(function ($msg) use (&$capturedHtml) {
+                $capturedHtml = $msg;
+                return true;
+            }));
+        Services::injectMock('email', $mockEmail);
+
+        $job = new SendCampaignJob([
+            'delivery_id' => $deliveryId,
+        ]);
+        $job->handle();
+
+        $bffUrl = rtrim((string) config('Project')->bffUrl, '/');
+        $landingUrl = config('Project')->landingUrl;
+
+        $this->assertStringContainsString($bffUrl . '/api/v1/newsletter/track/click/delivery-token-abc?url=' . urlencode('https://example.com/article?x=1'), $capturedHtml);
+        $this->assertStringContainsString($bffUrl . '/api/v1/newsletter/track/open/delivery-token-abc', $capturedHtml);
+        $this->assertStringContainsString("{$landingUrl}/unsubscribe?token=unsub-track-123", $capturedHtml);
+        $this->assertStringNotContainsString(urlencode("{$landingUrl}/unsubscribe?token=unsub-track-123"), $capturedHtml);
+    }
 }

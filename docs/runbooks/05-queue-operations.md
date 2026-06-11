@@ -103,6 +103,49 @@ Run the dispatcher every minute so scheduled campaigns are picked up automatical
 5. Confirm the delivery record moved to `sent`, or to `failed` with a useful `last_error`.
 6. If failures accumulate, inspect `failed_jobs` and the app logs before requeueing.
 
+## Isolated E2E smoke with run id
+
+For browser runs with real email, generate a unique identifier and include it in every record created through the UI:
+
+```bash
+RUN_ID="e2e-$(date +%Y%m%d-%H%M%S)"
+```
+
+Recommended conventions:
+
+- Campaign name: `Campaign ${RUN_ID}`
+- Campaign subject: `E2E Campaign ${RUN_ID}`
+- Subscriber email: use an address controlled by the external inbox, and record the `RUN_ID` in `first_name` or in the campaign name.
+- Do not reuse older campaigns for metric verification.
+
+Before running the worker, confirm that the normal flow left jobs in the `emails` queue:
+
+```sql
+SELECT id, queue, attempts, reserved_at, available_at, created_at
+FROM jobs
+WHERE queue = 'emails'
+ORDER BY id DESC
+LIMIT 10;
+```
+
+Process the queue without temporary commands:
+
+```bash
+php spark queue:work --queue=emails --once
+```
+
+For campaigns, verify only deliveries that belong to the campaign for this run:
+
+```sql
+SELECT d.id, d.email, d.status, d.attempts, d.last_error, d.sent_at
+FROM deliveries d
+JOIN campaigns c ON c.id = d.campaign_id
+WHERE c.name LIKE CONCAT('%', :run_id, '%')
+ORDER BY d.id;
+```
+
+Safe cleanup after a run: remove or archive only data that contains the explicit `RUN_ID`. Do not delete by status (`pending`, `failed`, `sent`) or broad date ranges, because that can touch unrelated manual tests.
+
 ## Troubleshooting
 
 - Jobs never start:
@@ -113,4 +156,3 @@ Run the dispatcher every minute so scheduled campaigns are picked up automatical
   - Read `last_error`, fix the underlying issue, and requeue only after the fix is verified.
 - Scheduled campaigns are not dispatching:
   - Confirm the cron entry for `campaign:dispatch` is active and the server time is correct.
-

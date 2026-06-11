@@ -144,6 +144,15 @@ final class CampaignServiceTest extends CIUnitTestCase
         $this->assertContains('sub1@example.com', $emails);
         $this->assertContains('sub2@example.com', $emails);
         $this->assertNotContains('sub3@example.com', $emails);
+
+        $queuedJobs = \Config\Database::connect()->table('jobs')->where('queue', 'emails')->get()->getResultArray();
+        $this->assertCount(2, $queuedJobs);
+
+        foreach ($queuedJobs as $queuedJob) {
+            $payload = json_decode((string) $queuedJob['payload'], true);
+            $this->assertSame(\App\Queue\Jobs\SendCampaignJob::class, $payload['job'] ?? null);
+            $this->assertArrayHasKey('delivery_id', $payload['data'] ?? []);
+        }
     }
 
     public function testDispatchFailsForSentCampaign(): void
