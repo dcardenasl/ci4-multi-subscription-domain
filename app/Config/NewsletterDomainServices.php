@@ -83,4 +83,17 @@ trait NewsletterDomainServices
         }
         return new \App\Services\Newsletter\EmailTemplateService(new \dcardenasl\Ci4ApiCore\Repositories\GenericRepository(model(\App\Models\EmailTemplateModel::class)), static::emailTemplateResponseMapper());
     }
+    public static function landingAnalyticsService(bool $getShared = true): \App\Interfaces\Newsletter\LandingAnalyticsServiceInterface
+    {
+        if ($getShared) {
+            return static::getSharedInstance('landingAnalyticsService');
+        }
+        return new \App\Services\Newsletter\LandingAnalyticsService(
+            new \dcardenasl\Ci4ApiCore\Repositories\GenericRepository(model(\App\Models\ProjectModel::class)),
+            new \dcardenasl\Ci4ApiCore\Repositories\GenericRepository(model(\App\Models\LandingAnalyticsSessionModel::class)),
+            new \dcardenasl\Ci4ApiCore\Repositories\GenericRepository(model(\App\Models\LandingAnalyticsEventModel::class)),
+            new \dcardenasl\Ci4ApiCore\Repositories\GenericRepository(model(\App\Models\LandingAnalyticsDailyAggregateModel::class)),
+            config(\Config\LandingAnalytics::class)
+        );
+    }
 }

@@ -39,4 +39,8 @@ return [
     'already_subscribed' => 'The email address is already subscribed to this project.',
     'import_rows_required' => 'The import requires at least one row.',
     'import_rows_limit' => 'The import accepts at most {0} rows per request.',
+
+    // Landing analytics rule messages
+    'events_required' => 'The events batch is required.',
+    'no_valid_events' => 'No valid analytics events were provided.',
 ];

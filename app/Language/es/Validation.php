@@ -39,4 +39,8 @@ return [
     'already_subscribed' => 'La dirección de correo ya está suscrita a este proyecto.',
     'import_rows_required' => 'La importación requiere al menos una fila.',
     'import_rows_limit' => 'La importación acepta como máximo {0} filas por solicitud.',
+
+    // Mensajes de regla de analytics de landing
+    'events_required' => 'El lote de eventos es requerido.',
+    'no_valid_events' => 'No se proporcionaron eventos de analytics válidos.',
 ];

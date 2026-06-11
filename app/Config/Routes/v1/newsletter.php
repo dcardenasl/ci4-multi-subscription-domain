@@ -6,6 +6,7 @@ $routes->group('newsletter', ['namespace' => '\App\Controllers\Api\V1\Newsletter
     // Public routes (no auth required)
     $routes->post('subscribers', 'SubscriberController::subscribe');
     $routes->post('subscribers/unsubscribe', 'SubscriberController::unsubscribe');
+    $routes->post('analytics/events', 'LandingAnalyticsController::ingest');
     // Webhooks (no auth required)
     $routes->post('webhooks/ses', 'WebhookController::ses');
     $routes->post('webhooks/sendgrid', 'WebhookController::sendgrid');
@@ -69,6 +70,13 @@ $routes->group('newsletter', ['namespace' => '\App\Controllers\Api\V1\Newsletter
         });
         $routes->group('', ['filter' => 'permission:newsletter.emailtemplates.delete'], function ($routes): void {
             $routes->delete('email-templates/(:num)', 'EmailTemplateController::delete/$1');
+        });
+        $routes->group('', ['filter' => 'permission:newsletter.analytics.read'], function ($routes): void {
+            $routes->get('analytics/overview', 'LandingAnalyticsController::overview');
+            $routes->get('analytics/funnel', 'LandingAnalyticsController::funnel');
+            $routes->get('analytics/sessions', 'LandingAnalyticsController::sessions');
+            $routes->get('analytics/sessions/(:num)', 'LandingAnalyticsController::session/$1');
+            $routes->get('subscribers/(:num)/journey', 'LandingAnalyticsController::journey/$1');
         });
     });
     $routes->get('subscribers/confirm/(:segment)', 'SubscriberController::confirm/$1');

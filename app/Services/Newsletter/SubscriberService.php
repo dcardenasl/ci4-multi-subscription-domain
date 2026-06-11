@@ -82,6 +82,16 @@ class SubscriberService extends BaseCrudService implements SubscriberServiceInte
                 throw new NotFoundException(lang('Api.resourceNotFound'));
             }
 
+            if (isset($data['analytics_session_id']) && !empty($data['analytics_session_id'])) {
+                model(\App\Models\LandingAnalyticsSessionModel::class)
+                    ->where('analytics_session_id', $data['analytics_session_id'])
+                    ->where('project_id', $projectResult->id)
+                    ->update(null, [
+                        'subscriber_id' => $entity->id,
+                        'converted_at' => date('Y-m-d H:i:s'),
+                    ]);
+            }
+
             $this->afterStore($entity, $context);
 
             if ($doubleOptIn && !empty($entity->confirm_token)) {
