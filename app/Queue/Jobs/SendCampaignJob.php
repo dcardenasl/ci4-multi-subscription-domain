@@ -72,11 +72,29 @@ class SendCampaignJob extends Job
 
             $email->setFrom($fromEmail, $fromName);
             $email->setTo($subscriber->email);
-            $email->setSubject($campaign->subject);
+            $subject = $campaign->subject;
+            $htmlBody = $campaign->html_body;
+            $textBody = $campaign->text_body;
+
+            if (!empty($subscriber->locale) && $subscriber->locale !== ($project->locale_default ?? 'es')) {
+                $transModel = model(\App\Models\CampaignTranslationModel::class);
+                $trans = $transModel->where('campaign_id', $campaign->id)
+                    ->where('locale', $subscriber->locale)
+                    ->first();
+                if ($trans !== null) {
+                    $subject = $trans->subject;
+                    $htmlBody = $trans->html_body;
+                    $textBody = $trans->text_body;
+                } else {
+                    log_message('warning', "[SendCampaignJob] Missing translation for campaign ID {$campaign->id} in locale '{$subscriber->locale}'. Falling back to default.");
+                }
+            }
+
+            $email->setSubject($subject);
 
             $renderer = new \App\Services\Newsletter\TemplateRendererService();
-            $htmlBody = $renderer->render($campaign->html_body, $project, $subscriber);
-            $textBody = $campaign->text_body ? $renderer->render($campaign->text_body, $project, $subscriber) : '';
+            $htmlBody = $renderer->render($htmlBody, $project, $subscriber);
+            $textBody = $textBody ? $renderer->render($textBody, $project, $subscriber) : '';
 
             // Click tracking URL rewriting
             if (!empty($delivery->delivery_token)) {

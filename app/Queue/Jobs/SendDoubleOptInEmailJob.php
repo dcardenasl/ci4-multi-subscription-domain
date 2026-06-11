@@ -62,10 +62,28 @@ class SendDoubleOptInEmailJob extends Job
         }
 
         if ($template !== null) {
+            $subject = $template->subject;
+            $htmlBody = $template->html_body;
+            $textBody = $template->text_body;
+
+            if (!empty($subscriber->locale) && $subscriber->locale !== ($project->locale_default ?? 'es')) {
+                $transModel = model(\App\Models\EmailTemplateTranslationModel::class);
+                $trans = $transModel->where('email_template_id', $project->double_opt_in_template_id)
+                    ->where('locale', $subscriber->locale)
+                    ->first();
+                if ($trans !== null) {
+                    $subject = $trans->subject;
+                    $htmlBody = $trans->html_body;
+                    $textBody = $trans->text_body;
+                } else {
+                    log_message('warning', "[SendDoubleOptInEmailJob] Missing translation for double opt-in template ID {$project->double_opt_in_template_id} in locale '{$subscriber->locale}'. Falling back to default.");
+                }
+            }
+
             $renderer = new \App\Services\Newsletter\TemplateRendererService();
-            $subject = $renderer->render($template->subject, $project, $subscriber);
-            $htmlBody = $renderer->render($template->html_body, $project, $subscriber);
-            $textBody = !empty($template->text_body) ? $renderer->render($template->text_body, $project, $subscriber) : '';
+            $subject = $renderer->render($subject, $project, $subscriber);
+            $htmlBody = $renderer->render($htmlBody, $project, $subscriber);
+            $textBody = !empty($textBody) ? $renderer->render($textBody, $project, $subscriber) : '';
         } else {
             $subject = lang('Subscribers.confirm_subscription_subject', [], $subscriberLocale) ?? 'Confirm your subscription';
             $htmlBody = lang('Subscribers.confirm_subscription_body_html', [$confirmUrl], $subscriberLocale);

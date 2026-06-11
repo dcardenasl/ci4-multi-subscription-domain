@@ -16,13 +16,14 @@ class TemplateRendererService
     public function render(string $content, ProjectEntity $project, SubscriberEntity $subscriber, array $additionalReplacements = []): string
     {
         $landingUrl = config('Project')->landingUrl;
+        $localeSegment = !empty($subscriber->locale) ? '/' . $subscriber->locale : '';
 
         $confirmUrl = !empty($subscriber->confirm_token)
-            ? "{$landingUrl}/confirm/" . $subscriber->confirm_token
+            ? "{$landingUrl}{$localeSegment}/confirm/" . $subscriber->confirm_token
             : '';
 
         $unsubscribeUrl = !empty($subscriber->unsubscribe_token)
-            ? "{$landingUrl}/unsubscribe?token=" . $subscriber->unsubscribe_token
+            ? "{$landingUrl}{$localeSegment}/unsubscribe?token=" . $subscriber->unsubscribe_token
             : '';
 
         $firstName = !empty($subscriber->first_name)
