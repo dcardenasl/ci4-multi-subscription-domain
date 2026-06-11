@@ -22,16 +22,8 @@ class SubscriberModel extends BaseAuditableModel
 
     protected $allowedFields = ['project_id', 'email', 'first_name', 'locale', 'status', 'confirm_token', 'unsubscribe_token', 'invitation_code', 'confirmed_at', 'unsubscribed_at'];
 
-    /**
-     * Intentionally empty: core QueryBuilder search only emits MATCH/AGAINST
-     * (fulltext) and the subscribers table has no FULLTEXT index — enabling
-     * fields here would turn every search into a 500. See upstream fix note
-     * in ci4-api-core (QueryBuilder::search reads searchEnabled instead of
-     * searchUseFulltext).
-     *
-     * @var array<int, string>
-     */
-    protected array $searchableFields = [];
+    /** @var array<int, string> */
+    protected array $searchableFields = ['email', 'first_name'];
 
     /** @var array<int, string> */
     protected array $filterableFields = ['id', 'project_id', 'status'];

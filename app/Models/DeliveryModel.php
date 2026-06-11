@@ -26,7 +26,7 @@ class DeliveryModel extends BaseAuditableModel
     protected array $searchableFields = [];
 
     /** @var array<int, string> */
-    protected array $filterableFields = ['id', 'delivery_token'];
+    protected array $filterableFields = ['id', 'delivery_token', 'subscriber_id', 'email'];
 
     /** @var array<int, string> */
     protected array $sortableFields = ['id', 'created_at'];
@@ -46,4 +46,28 @@ class DeliveryModel extends BaseAuditableModel
         'clicks_count' => 'permit_empty|integer',
         'sent_at' => 'permit_empty|valid_date',
     ];
+
+    public function findAll(?int $limit = null, int $offset = 0)
+    {
+        $this->select('deliveries.*, campaigns.name as campaign_name, campaigns.subject as campaign_subject, projects.name as project_name')
+             ->join('campaigns', 'campaigns.id = deliveries.campaign_id', 'left')
+             ->join('projects', 'projects.id = deliveries.project_id', 'left');
+        return parent::findAll($limit, $offset);
+    }
+
+    public function find($id = null)
+    {
+        $this->select('deliveries.*, campaigns.name as campaign_name, campaigns.subject as campaign_subject, projects.name as project_name')
+             ->join('campaigns', 'campaigns.id = deliveries.campaign_id', 'left')
+             ->join('projects', 'projects.id = deliveries.project_id', 'left');
+        return parent::find($id);
+    }
+
+    public function first()
+    {
+        $this->select('deliveries.*, campaigns.name as campaign_name, campaigns.subject as campaign_subject, projects.name as project_name')
+             ->join('campaigns', 'campaigns.id = deliveries.campaign_id', 'left')
+             ->join('projects', 'projects.id = deliveries.project_id', 'left');
+        return parent::first();
+    }
 }

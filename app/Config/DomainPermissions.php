@@ -39,5 +39,6 @@ class DomainPermissions
         ['code' => 'newsletter.emailtemplates.read', 'resource' => 'email-templates', 'action' => 'read', 'description' => 'Read EmailTemplates'],
         ['code' => 'newsletter.emailtemplates.write', 'resource' => 'email-templates', 'action' => 'write', 'description' => 'Create or update EmailTemplate'],
         ['code' => 'newsletter.emailtemplates.delete', 'resource' => 'email-templates', 'action' => 'delete', 'description' => 'Delete EmailTemplate'],
+        ['code' => 'newsletter.analytics.read', 'resource' => 'analytics', 'action' => 'read', 'description' => 'Read Landing Analytics'],
     ];
 }

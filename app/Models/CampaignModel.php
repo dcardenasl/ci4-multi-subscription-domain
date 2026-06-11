@@ -22,12 +22,8 @@ class CampaignModel extends BaseAuditableModel
 
     protected $allowedFields = ['project_id', 'name', 'subject', 'html_body', 'text_body', 'status', 'scheduled_at', 'send_started_at', 'sent_at', 'failed_at', 'failure_reason', 'opened_count', 'clicked_count'];
 
-    /**
-     * Intentionally empty — see note in SubscriberModel::$searchableFields.
-     *
-     * @var array<int, string>
-     */
-    protected array $searchableFields = [];
+    /** @var array<int, string> */
+    protected array $searchableFields = ['name', 'subject'];
 
     /** @var array<int, string> */
     protected array $filterableFields = ['id', 'project_id', 'status'];
