@@ -28,6 +28,7 @@ class ProjectEntity extends Entity
         'locale_default' => 'string',
         'recaptcha_site_key' => 'string',
         'recaptcha_secret_key' => 'string',
+        'supported_locales' => 'string',
     ];
 
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];

@@ -42,7 +42,9 @@ final readonly class CampaignResponseDTO implements DataTransferObjectInterface
         #[OA\Property(property: 'created_at', description: 'Creation timestamp', example: '2026-02-26 12:00:00', nullable: true)]
         public ?string $createdAt = null,
         #[OA\Property(property: 'updated_at', description: 'Last update timestamp', example: '2026-02-26 12:00:00', nullable: true)]
-        public ?string $updatedAt = null
+        public ?string $updatedAt = null,
+        #[OA\Property(description: 'translations', type: 'array', items: new OA\Items(type: 'object'))]
+        public array $translations = []
     ) {
     }
 
@@ -66,6 +68,14 @@ final readonly class CampaignResponseDTO implements DataTransferObjectInterface
             failure_reason: (string) ($data['failure_reason'] ?? ''),
             createdAt: isset($data['created_at']) ? (string) $data['created_at'] : null,
             updatedAt: isset($data['updated_at']) ? (string) $data['updated_at'] : null,
+            translations: (function () use ($data) {
+                $t = $data['translations'] ?? null;
+                if ($t === null && isset($data['id'])) {
+                    $t = model(\App\Models\CampaignTranslationModel::class)->where('campaign_id', $data['id'])->findAll();
+                    $t = array_map(fn ($x) => is_object($x) ? $x->toArray() : $x, $t);
+                }
+                return $t ?? [];
+            })()
         );
     }
 
@@ -89,6 +99,7 @@ final readonly class CampaignResponseDTO implements DataTransferObjectInterface
             'failure_reason' => $this->failure_reason,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
+            'translations' => $this->translations,
         ];
     }
 }

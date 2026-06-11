@@ -25,6 +25,8 @@ final readonly class LandingConfigResponseDTO implements DataTransferObjectInter
         public int $double_opt_in_enabled,
         #[OA\Property(description: 'recaptcha_site_key', type: 'string', nullable: true)]
         public ?string $recaptcha_site_key,
+        #[OA\Property(description: 'supported_locales', type: 'string', nullable: true)]
+        public ?string $supported_locales = null,
     ) {
     }
 
@@ -36,6 +38,7 @@ final readonly class LandingConfigResponseDTO implements DataTransferObjectInter
             locale_default: (string) ($data['locale_default'] ?? ''),
             double_opt_in_enabled: (int) ($data['double_opt_in_enabled'] ?? 0),
             recaptcha_site_key: $data['recaptcha_site_key'] ?? null,
+            supported_locales: $data['supported_locales'] ?? null,
         );
     }
 
@@ -47,6 +50,7 @@ final readonly class LandingConfigResponseDTO implements DataTransferObjectInter
             'locale_default'        => $this->locale_default,
             'double_opt_in_enabled' => $this->double_opt_in_enabled,
             'recaptcha_site_key'    => $this->recaptcha_site_key,
+            'supported_locales'     => $this->supported_locales,
         ];
     }
 }

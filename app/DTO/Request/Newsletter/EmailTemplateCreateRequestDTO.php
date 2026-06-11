@@ -22,6 +22,8 @@ readonly class EmailTemplateCreateRequestDTO extends BaseRequestDTO
     public string $text_body;
     #[OA\Property(description: 'type', type: 'string')]
     public string $type;
+    #[OA\Property(description: 'translations', type: 'array', items: new OA\Items(type: 'object'))]
+    public ?array $translations;
 
     /**
      * @return array<string, string>
@@ -35,6 +37,7 @@ readonly class EmailTemplateCreateRequestDTO extends BaseRequestDTO
             'html_body' => 'required|string',
             'text_body' => 'permit_empty|string',
             'type' => 'required|string|max_length[255]',
+            'translations' => 'permit_empty|matches_array',
         ];
     }
 
@@ -49,6 +52,7 @@ readonly class EmailTemplateCreateRequestDTO extends BaseRequestDTO
         $this->html_body = (string) ($data['html_body'] ?? '');
         $this->text_body = (string) ($data['text_body'] ?? '');
         $this->type = (string) ($data['type'] ?? '');
+        $this->translations = $data['translations'] ?? null;
     }
 
     /**
@@ -63,6 +67,7 @@ readonly class EmailTemplateCreateRequestDTO extends BaseRequestDTO
             'html_body' => $this->html_body,
             'text_body' => $this->text_body,
             'type' => $this->type,
+            'translations' => $this->translations,
         ];
     }
 }

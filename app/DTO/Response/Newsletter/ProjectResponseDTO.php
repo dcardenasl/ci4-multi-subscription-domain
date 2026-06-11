@@ -53,6 +53,8 @@ final readonly class ProjectResponseDTO implements DataTransferObjectInterface
         public string $recaptcha_site_key,
         #[OA\Property(description: 'recaptcha_secret_key', type: 'string')]
         public string $recaptcha_secret_key,
+        #[OA\Property(description: 'supported_locales', type: 'string', nullable: true)]
+        public ?string $supported_locales = null,
         #[OA\Property(property: 'created_at', description: 'Creation timestamp', example: '2026-02-26 12:00:00', nullable: true)]
         public ?string $createdAt = null,
         #[OA\Property(property: 'updated_at', description: 'Last update timestamp', example: '2026-02-26 12:00:00', nullable: true)]
@@ -85,6 +87,7 @@ final readonly class ProjectResponseDTO implements DataTransferObjectInterface
             locale_default: (string) ($data['locale_default'] ?? ''),
             recaptcha_site_key: (string) ($data['recaptcha_site_key'] ?? ''),
             recaptcha_secret_key: (string) ($data['recaptcha_secret_key'] ?? ''),
+            supported_locales: $data['supported_locales'] ?? null,
             createdAt: isset($data['created_at']) ? (string) $data['created_at'] : null,
             updatedAt: isset($data['updated_at']) ? (string) $data['updated_at'] : null,
         );
@@ -115,6 +118,7 @@ final readonly class ProjectResponseDTO implements DataTransferObjectInterface
             'locale_default' => $this->locale_default,
             'recaptcha_site_key' => $this->recaptcha_site_key,
             'recaptcha_secret_key' => $this->recaptcha_secret_key,
+            'supported_locales' => $this->supported_locales,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
         ];

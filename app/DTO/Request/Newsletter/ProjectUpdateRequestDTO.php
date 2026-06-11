@@ -46,6 +46,8 @@ readonly class ProjectUpdateRequestDTO extends BaseRequestDTO
     public ?string $recaptcha_site_key;
     #[OA\Property(description: 'recaptcha_secret_key', type: 'string', nullable: true)]
     public ?string $recaptcha_secret_key;
+    #[OA\Property(description: 'supported_locales', type: 'string', nullable: true)]
+    public ?string $supported_locales;
 
     /**
      * @return array<string, string>
@@ -71,6 +73,7 @@ readonly class ProjectUpdateRequestDTO extends BaseRequestDTO
             'locale_default' => 'permit_empty|string|max_length[255]',
             'recaptcha_site_key' => 'permit_empty|string|max_length[255]',
             'recaptcha_secret_key' => 'permit_empty|string|max_length[255]',
+            'supported_locales' => 'permit_empty|string|max_length[255]',
         ];
     }
 
@@ -97,6 +100,7 @@ readonly class ProjectUpdateRequestDTO extends BaseRequestDTO
         $this->locale_default = $data['locale_default'] ?? null;
         $this->recaptcha_site_key = $data['recaptcha_site_key'] ?? null;
         $this->recaptcha_secret_key = $data['recaptcha_secret_key'] ?? null;
+        $this->supported_locales = $data['supported_locales'] ?? null;
     }
 
     /**
@@ -123,6 +127,7 @@ readonly class ProjectUpdateRequestDTO extends BaseRequestDTO
             'locale_default' => $this->locale_default,
             'recaptcha_site_key' => $this->recaptcha_site_key,
             'recaptcha_secret_key' => $this->recaptcha_secret_key,
+            'supported_locales' => $this->supported_locales,
         ];
 
         return array_filter($arr, static fn (mixed $value): bool => $value !== null);

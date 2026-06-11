@@ -32,6 +32,8 @@ readonly class CampaignCreateRequestDTO extends BaseRequestDTO
     public string $failed_at;
     #[OA\Property(description: 'failure_reason', type: 'string')]
     public string $failure_reason;
+    #[OA\Property(description: 'translations', type: 'array', items: new OA\Items(type: 'object'))]
+    public ?array $translations;
 
     /**
      * @return array<string, string>
@@ -50,6 +52,7 @@ readonly class CampaignCreateRequestDTO extends BaseRequestDTO
             'sent_at' => 'permit_empty|valid_date',
             'failed_at' => 'permit_empty|valid_date',
             'failure_reason' => 'permit_empty|string',
+            'translations' => 'permit_empty|matches_array',
         ];
     }
 
@@ -69,6 +72,7 @@ readonly class CampaignCreateRequestDTO extends BaseRequestDTO
         $this->sent_at = (string) ($data['sent_at'] ?? '');
         $this->failed_at = (string) ($data['failed_at'] ?? '');
         $this->failure_reason = (string) ($data['failure_reason'] ?? '');
+        $this->translations = $data['translations'] ?? null;
     }
 
     /**
@@ -88,6 +92,7 @@ readonly class CampaignCreateRequestDTO extends BaseRequestDTO
             'sent_at' => $this->sent_at,
             'failed_at' => $this->failed_at,
             'failure_reason' => $this->failure_reason,
+            'translations' => $this->translations,
         ];
     }
 }

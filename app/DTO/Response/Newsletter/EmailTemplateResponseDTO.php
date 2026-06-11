@@ -32,7 +32,9 @@ final readonly class EmailTemplateResponseDTO implements DataTransferObjectInter
         #[OA\Property(property: 'created_at', description: 'Creation timestamp', example: '2026-02-26 12:00:00', nullable: true)]
         public ?string $createdAt = null,
         #[OA\Property(property: 'updated_at', description: 'Last update timestamp', example: '2026-02-26 12:00:00', nullable: true)]
-        public ?string $updatedAt = null
+        public ?string $updatedAt = null,
+        #[OA\Property(description: 'translations', type: 'array', items: new OA\Items(type: 'object'))]
+        public array $translations = []
     ) {
     }
 
@@ -51,6 +53,14 @@ final readonly class EmailTemplateResponseDTO implements DataTransferObjectInter
             type: (string) ($data['type'] ?? ''),
             createdAt: $data['created_at'] ?? null,
             updatedAt: $data['updated_at'] ?? null,
+            translations: (function () use ($data) {
+                $t = $data['translations'] ?? null;
+                if ($t === null && isset($data['id'])) {
+                    $t = model(\App\Models\EmailTemplateTranslationModel::class)->where('email_template_id', $data['id'])->findAll();
+                    $t = array_map(fn ($x) => is_object($x) ? $x->toArray() : $x, $t);
+                }
+                return $t ?? [];
+            })()
         );
     }
 
@@ -69,6 +79,7 @@ final readonly class EmailTemplateResponseDTO implements DataTransferObjectInter
             'type' => $this->type,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
+            'translations' => $this->translations,
         ];
     }
 }
