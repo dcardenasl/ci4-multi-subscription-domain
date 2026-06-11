@@ -95,6 +95,7 @@ class SendCampaignJob extends Job
             $renderer = new \App\Services\Newsletter\TemplateRendererService();
             $htmlBody = $renderer->render($htmlBody, $project, $subscriber);
             $textBody = $textBody ? $renderer->render($textBody, $project, $subscriber) : '';
+            $bffUrl = rtrim((string) config('Project')->bffUrl, '/');
 
             // Click tracking URL rewriting
             if (!empty($delivery->delivery_token)) {
