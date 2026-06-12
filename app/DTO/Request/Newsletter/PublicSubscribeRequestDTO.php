@@ -22,6 +22,8 @@ readonly class PublicSubscribeRequestDTO extends BaseRequestDTO
     public ?string $locale;
     #[OA\Property(description: 'analytics_session_id', type: 'string', nullable: true)]
     public ?string $analytics_session_id;
+    #[OA\Property(description: 'recaptcha_token', type: 'string', nullable: true)]
+    public ?string $recaptcha_token;
 
     public function rules(): array
     {
@@ -32,6 +34,7 @@ readonly class PublicSubscribeRequestDTO extends BaseRequestDTO
             'first_name'            => 'permit_empty|string|max_length[255]',
             'locale'                => 'permit_empty|string|max_length[10]',
             'analytics_session_id'  => 'permit_empty|string|max_length[64]',
+            'recaptcha_token'       => 'permit_empty|string|max_length[4096]',
         ];
     }
 
@@ -43,6 +46,7 @@ readonly class PublicSubscribeRequestDTO extends BaseRequestDTO
         $this->first_name          = $data['first_name'] ?? null;
         $this->locale              = $data['locale'] ?? null;
         $this->analytics_session_id = $data['analytics_session_id'] ?? null;
+        $this->recaptcha_token     = $data['recaptcha_token'] ?? null;
     }
 
     public function toArray(): array
@@ -54,6 +58,7 @@ readonly class PublicSubscribeRequestDTO extends BaseRequestDTO
             'first_name'            => $this->first_name,
             'locale'                => $this->locale,
             'analytics_session_id'  => $this->analytics_session_id,
+            'recaptcha_token'       => $this->recaptcha_token,
         ];
     }
 }

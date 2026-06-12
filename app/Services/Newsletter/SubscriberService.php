@@ -42,6 +42,8 @@ class SubscriberService extends BaseCrudService implements SubscriberServiceInte
                 throw new NotFoundException(lang('Api.resourceNotFound'));
             }
 
+            $this->assertRecaptchaIsValid($projectResult, $data['recaptcha_token'] ?? null);
+
             $existingResult = model(\App\Models\SubscriberModel::class)
                 ->where('project_id', $projectResult->id)
                 ->where('email', $data['email'])
@@ -102,6 +104,66 @@ class SubscriberService extends BaseCrudService implements SubscriberServiceInte
 
             return $this->responseMapper->map($entity);
         });
+    }
+
+    private function assertRecaptchaIsValid(object $project, ?string $token): void
+    {
+        $secret = trim((string) ($project->recaptcha_secret_key ?? ''));
+        if ($secret === '') {
+            return;
+        }
+
+        $token = trim((string) $token);
+        if ($token === '') {
+            throw new ValidationException(lang('Api.validationFailed'), [
+                'recaptcha_token' => lang('Validation.recaptcha_failed'),
+            ]);
+        }
+
+        try {
+            $response = service('curlrequest')->post('https://www.google.com/recaptcha/api/siteverify', [
+                'form_params' => [
+                    'secret'   => $secret,
+                    'response' => $token,
+                    'remoteip' => service('request')->getIPAddress(),
+                ],
+                'timeout'     => 5,
+                'http_errors' => false,
+            ]);
+        } catch (\Throwable $e) {
+            log_message('warning', '[Newsletter] reCAPTCHA verification request failed: {message}', [
+                'message' => $e->getMessage(),
+            ]);
+
+            throw new ValidationException(lang('Api.validationFailed'), [
+                'recaptcha_token' => lang('Validation.recaptcha_failed'),
+            ]);
+        }
+
+        if ($response->getStatusCode() !== 200) {
+            throw new ValidationException(lang('Api.validationFailed'), [
+                'recaptcha_token' => lang('Validation.recaptcha_failed'),
+            ]);
+        }
+
+        $body = json_decode((string) $response->getBody(), true);
+        if (! is_array($body) || ($body['success'] ?? false) !== true) {
+            throw new ValidationException(lang('Api.validationFailed'), [
+                'recaptcha_token' => lang('Validation.recaptcha_failed'),
+            ]);
+        }
+
+        if (($body['action'] ?? 'newsletter_subscription') !== 'newsletter_subscription') {
+            throw new ValidationException(lang('Api.validationFailed'), [
+                'recaptcha_token' => lang('Validation.recaptcha_failed'),
+            ]);
+        }
+
+        if (isset($body['score']) && (float) $body['score'] < 0.5) {
+            throw new ValidationException(lang('Api.validationFailed'), [
+                'recaptcha_token' => lang('Validation.recaptcha_failed'),
+            ]);
+        }
     }
 
     /**
