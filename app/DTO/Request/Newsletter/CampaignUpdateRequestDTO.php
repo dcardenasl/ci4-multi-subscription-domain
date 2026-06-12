@@ -12,6 +12,8 @@ readonly class CampaignUpdateRequestDTO extends BaseRequestDTO
 {
     #[OA\Property(description: 'project_id', type: 'integer', nullable: true)]
     public ?int $project_id;
+    #[OA\Property(description: 'template_id', type: 'integer', nullable: true)]
+    public ?int $template_id;
     #[OA\Property(description: 'name', type: 'string', nullable: true)]
     public ?string $name;
     #[OA\Property(description: 'subject', type: 'string', nullable: true)]
@@ -42,6 +44,7 @@ readonly class CampaignUpdateRequestDTO extends BaseRequestDTO
     {
         return [
             'project_id' => 'permit_empty|integer',
+            'template_id' => 'permit_empty|integer',
             'name' => 'permit_empty|string|max_length[255]',
             'subject' => 'permit_empty|string|max_length[255]',
             'html_body' => 'permit_empty|string',
@@ -62,6 +65,7 @@ readonly class CampaignUpdateRequestDTO extends BaseRequestDTO
     protected function map(array $data): void
     {
         $this->project_id = isset($data['project_id']) ? (int) $data['project_id'] : null;
+        $this->template_id = array_key_exists('template_id', $data) ? (isset($data['template_id']) && $data['template_id'] !== '' ? (int) $data['template_id'] : null) : -1;
         $this->name = $data['name'] ?? null;
         $this->subject = $data['subject'] ?? null;
         $this->html_body = $data['html_body'] ?? null;
@@ -80,7 +84,7 @@ readonly class CampaignUpdateRequestDTO extends BaseRequestDTO
      */
     public function toArray(): array
     {
-        return array_filter([
+        $arr = array_filter([
             'project_id' => $this->project_id,
             'name' => $this->name,
             'subject' => $this->subject,
@@ -94,5 +98,11 @@ readonly class CampaignUpdateRequestDTO extends BaseRequestDTO
             'failure_reason' => $this->failure_reason,
             'translations' => $this->translations,
         ], static fn (mixed $value): bool => $value !== null);
+
+        if ($this->template_id !== -1) {
+            $arr['template_id'] = $this->template_id;
+        }
+
+        return $arr;
     }
 }

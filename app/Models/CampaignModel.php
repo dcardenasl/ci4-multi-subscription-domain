@@ -20,19 +20,20 @@ class CampaignModel extends BaseAuditableModel
     protected $useSoftDeletes = true;
     protected $useTimestamps = true;
 
-    protected $allowedFields = ['project_id', 'name', 'subject', 'html_body', 'text_body', 'status', 'scheduled_at', 'send_started_at', 'sent_at', 'failed_at', 'failure_reason', 'opened_count', 'clicked_count'];
+    protected $allowedFields = ['project_id', 'template_id', 'name', 'subject', 'html_body', 'text_body', 'status', 'scheduled_at', 'send_started_at', 'sent_at', 'failed_at', 'failure_reason', 'opened_count', 'clicked_count'];
 
     /** @var array<int, string> */
     protected array $searchableFields = ['name', 'subject'];
 
     /** @var array<int, string> */
-    protected array $filterableFields = ['id', 'project_id', 'status'];
+    protected array $filterableFields = ['id', 'project_id', 'template_id', 'status'];
 
     /** @var array<int, string> */
     protected array $sortableFields = ['id', 'name', 'subject', 'project_id', 'status', 'scheduled_at', 'created_at'];
 
     protected $validationRules = [
         'project_id' => 'required|integer',
+        'template_id' => 'permit_empty|integer',
         'name' => 'required|string|max_length[255]',
         'subject' => 'required|string|max_length[255]',
         'html_body' => 'required|string',

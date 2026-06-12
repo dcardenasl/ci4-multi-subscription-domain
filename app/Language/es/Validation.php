@@ -39,6 +39,10 @@ return [
     'already_subscribed' => 'La dirección de correo ya está suscrita a este proyecto.',
     'import_rows_required' => 'La importación requiere al menos una fila.',
     'import_rows_limit' => 'La importación acepta como máximo {0} filas por solicitud.',
+    'recaptcha_failed' => 'La verificación reCAPTCHA falló. Inténtalo nuevamente.',
+    'media_upload_invalid_file' => 'Archivo inválido o no se subió ningún archivo.',
+    'media_upload_invalid_type' => 'Solo se permiten imágenes PNG, JPEG, GIF y WebP.',
+    'media_upload_size_limit' => 'El tamaño de la imagen debe ser menor a 5MB.',
 
     // Mensajes de regla de analytics de landing
     'events_required' => 'El lote de eventos es requerido.',

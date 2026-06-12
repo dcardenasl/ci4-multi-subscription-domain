@@ -19,6 +19,8 @@ final readonly class CampaignResponseDTO implements DataTransferObjectInterface
         public int $id,
         #[OA\Property(description: 'project_id', type: 'integer')]
         public int $project_id,
+        #[OA\Property(description: 'template_id', type: 'integer', nullable: true)]
+        public ?int $template_id,
         #[OA\Property(description: 'name', type: 'string')]
         public string $name,
         #[OA\Property(description: 'subject', type: 'string')]
@@ -56,6 +58,7 @@ final readonly class CampaignResponseDTO implements DataTransferObjectInterface
         return new static(
             id: (int) ($data['id'] ?? 0),
             project_id: (int) ($data['project_id'] ?? 0),
+            template_id: isset($data['template_id']) && $data['template_id'] !== '' ? (int) $data['template_id'] : null,
             name: (string) ($data['name'] ?? ''),
             subject: (string) ($data['subject'] ?? ''),
             html_body: (string) ($data['html_body'] ?? ''),
@@ -87,6 +90,7 @@ final readonly class CampaignResponseDTO implements DataTransferObjectInterface
         return [
             'id' => $this->id,
             'project_id' => $this->project_id,
+            'template_id' => $this->template_id,
             'name' => $this->name,
             'subject' => $this->subject,
             'html_body' => $this->html_body,

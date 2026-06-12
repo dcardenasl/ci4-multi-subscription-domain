@@ -11,6 +11,7 @@ class CampaignEntity extends Entity
     protected $casts = [
         'id' => 'integer',
         'project_id' => 'int',
+        'template_id' => '?int',
         'name' => 'string',
         'subject' => 'string',
         'html_body' => 'string',

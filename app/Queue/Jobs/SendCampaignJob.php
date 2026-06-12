@@ -90,6 +90,42 @@ class SendCampaignJob extends Job
                 }
             }
 
+            // Wrap in layout template if set
+            if (!empty($campaign->template_id)) {
+                $emailTemplateModel = model(\App\Models\EmailTemplateModel::class);
+                $template = $emailTemplateModel->find($campaign->template_id);
+                if ($template !== null) {
+                    $layoutHtml = $template->html_body;
+                    $layoutText = $template->text_body ?? '';
+
+                    if (!empty($subscriber->locale) && $subscriber->locale !== ($project->locale_default ?? 'es')) {
+                        $templateTransModel = model(\App\Models\EmailTemplateTranslationModel::class);
+                        $templateTrans = $templateTransModel->where('email_template_id', $template->id)
+                            ->where('locale', $subscriber->locale)
+                            ->first();
+                        if ($templateTrans !== null) {
+                            $layoutHtml = $templateTrans->html_body;
+                            $layoutText = $templateTrans->text_body ?? '';
+                        }
+                    }
+
+                    if (!empty($layoutHtml)) {
+                        if (str_contains($layoutHtml, '{{content}}')) {
+                            $htmlBody = str_replace('{{content}}', $htmlBody, $layoutHtml);
+                        } else {
+                            $htmlBody = $layoutHtml . $htmlBody;
+                        }
+                    }
+                    if ($textBody !== null && $textBody !== '' && !empty($layoutText)) {
+                        if (str_contains($layoutText, '{{content}}')) {
+                            $textBody = str_replace('{{content}}', $textBody, $layoutText);
+                        } else {
+                            $textBody = $layoutText . "\n\n" . $textBody;
+                        }
+                    }
+                }
+            }
+
             $email->setSubject($subject);
 
             $renderer = new \App\Services\Newsletter\TemplateRendererService();

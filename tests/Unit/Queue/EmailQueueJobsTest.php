@@ -329,4 +329,72 @@ final class EmailQueueJobsTest extends CIUnitTestCase
         $this->assertStringContainsString("{$landingUrl}/unsubscribe?token=unsub-track-123", $capturedHtml);
         $this->assertStringNotContainsString(urlencode("{$landingUrl}/unsubscribe?token=unsub-track-123"), $capturedHtml);
     }
+
+    public function testSendCampaignJobWrapsInLayoutTemplate(): void
+    {
+        $projectId = $this->createProject();
+
+        $subscriberId = $this->createSubscriber($projectId, [
+            'status' => 'confirmed',
+            'unsubscribe_token' => 'unsub-wrap-123',
+        ]);
+
+        // Create layout template
+        $templateModel = model(\App\Models\EmailTemplateModel::class);
+        $templateId = $templateModel->insert([
+            'project_id' => $projectId,
+            'name' => 'Fancy Layout',
+            'subject' => 'Default Template Subject',
+            'html_body' => '<html><body><div class="layout-header">Header</div><div class="content">{{content}}</div></body></html>',
+            'text_body' => 'Template text: {{content}}',
+            'type' => 'campaign_layout',
+        ]);
+
+        $campaignId = $this->createCampaign($projectId, [
+            'template_id' => $templateId,
+            'html_body' => '<p>My Campaign Content</p>',
+            'text_body' => 'My plain campaign content',
+        ]);
+
+        $deliveryModel = model(DeliveryModel::class);
+        $deliveryId = $deliveryModel->insert([
+            'project_id' => $projectId,
+            'campaign_id' => $campaignId,
+            'subscriber_id' => $subscriberId,
+            'email' => 'wrapped@example.com',
+            'status' => 'pending',
+            'attempts' => 0,
+            'last_error' => '',
+            'provider_message_id' => '',
+            'sent_at' => '1000-01-01 00:00:00',
+        ]);
+
+        $capturedHtml = '';
+        $capturedText = '';
+        $mockEmail = $this->getMockBuilder(Email::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockEmail->method('send')->willReturn(true);
+        $mockEmail->expects($this->once())
+            ->method('setMessage')
+            ->with($this->callback(function ($msg) use (&$capturedHtml) {
+                $capturedHtml = $msg;
+                return true;
+            }));
+        $mockEmail->expects($this->once())
+            ->method('setAltMessage')
+            ->with($this->callback(function ($msg) use (&$capturedText) {
+                $capturedText = $msg;
+                return true;
+            }));
+        Services::injectMock('email', $mockEmail);
+
+        $job = new SendCampaignJob([
+            'delivery_id' => $deliveryId,
+        ]);
+        $job->handle();
+
+        $this->assertStringContainsString('<html><body><div class="layout-header">Header</div><div class="content"><p>My Campaign Content</p></div></body></html>', $capturedHtml);
+        $this->assertStringContainsString('Template text: My plain campaign content', $capturedText);
+    }
 }

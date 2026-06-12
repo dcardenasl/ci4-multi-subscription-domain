@@ -39,6 +39,10 @@ return [
     'already_subscribed' => 'The email address is already subscribed to this project.',
     'import_rows_required' => 'The import requires at least one row.',
     'import_rows_limit' => 'The import accepts at most {0} rows per request.',
+    'recaptcha_failed' => 'The reCAPTCHA verification failed. Please try again.',
+    'media_upload_invalid_file' => 'Invalid file or no file uploaded.',
+    'media_upload_invalid_type' => 'Only PNG, JPEG, GIF, and WebP images are allowed.',
+    'media_upload_size_limit' => 'Image size must be less than 5MB.',
 
     // Landing analytics rule messages
     'events_required' => 'The events batch is required.',

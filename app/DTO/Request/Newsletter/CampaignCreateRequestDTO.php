@@ -12,6 +12,8 @@ readonly class CampaignCreateRequestDTO extends BaseRequestDTO
 {
     #[OA\Property(description: 'project_id', type: 'integer')]
     public int $project_id;
+    #[OA\Property(description: 'template_id', type: 'integer', nullable: true)]
+    public ?int $template_id;
     #[OA\Property(description: 'name', type: 'string')]
     public string $name;
     #[OA\Property(description: 'subject', type: 'string')]
@@ -42,6 +44,7 @@ readonly class CampaignCreateRequestDTO extends BaseRequestDTO
     {
         return [
             'project_id' => 'required|integer',
+            'template_id' => 'permit_empty|integer',
             'name' => 'required|string|max_length[255]',
             'subject' => 'required|string|max_length[255]',
             'html_body' => 'required|string',
@@ -62,6 +65,7 @@ readonly class CampaignCreateRequestDTO extends BaseRequestDTO
     protected function map(array $data): void
     {
         $this->project_id = (int) ($data['project_id'] ?? 0);
+        $this->template_id = isset($data['template_id']) && $data['template_id'] !== '' ? (int) $data['template_id'] : null;
         $this->name = (string) ($data['name'] ?? '');
         $this->subject = (string) ($data['subject'] ?? '');
         $this->html_body = (string) ($data['html_body'] ?? '');
@@ -82,6 +86,7 @@ readonly class CampaignCreateRequestDTO extends BaseRequestDTO
     {
         return [
             'project_id' => $this->project_id,
+            'template_id' => $this->template_id,
             'name' => $this->name,
             'subject' => $this->subject,
             'html_body' => $this->html_body,
