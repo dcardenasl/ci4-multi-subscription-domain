@@ -111,6 +111,18 @@ For browser runs with real email, generate a unique identifier and include it in
 RUN_ID="e2e-$(date +%Y%m%d-%H%M%S)"
 ```
 
+You can also prepare an isolated run from the domain without storing external credentials:
+
+```bash
+php spark newsletter:e2e:prepare --run-id="$RUN_ID" --project-key=test-project-key --email=your-controlled-inbox@example.test
+```
+
+The command first cleans data owned by that `RUN_ID`, ensures the project exists, creates a traceable `draft` campaign, and, when `--email` is provided, creates a confirmed subscriber for campaign delivery checks. To clean up at the end without creating new data:
+
+```bash
+php spark newsletter:e2e:prepare --run-id="$RUN_ID" --project-key=test-project-key --cleanup-only
+```
+
 Recommended conventions:
 
 - Campaign name: `Campaign ${RUN_ID}`

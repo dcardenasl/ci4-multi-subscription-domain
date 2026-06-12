@@ -111,6 +111,18 @@ Para corridas con navegador y correo real, usa un identificador único y ponlo e
 RUN_ID="e2e-$(date +%Y%m%d-%H%M%S)"
 ```
 
+También puedes preparar una corrida aislada desde el domain sin guardar credenciales externas:
+
+```bash
+php spark newsletter:e2e:prepare --run-id="$RUN_ID" --project-key=test-project-key --email=tu-bandeja-controlada@example.test
+```
+
+El comando limpia primero datos propios de ese `RUN_ID`, asegura el proyecto, crea una campaña `draft` con nombre/asunto trazables y, si pasas `--email`, crea un subscriber confirmado para probar campaign deliveries. Para limpiar al final sin crear nuevos datos:
+
+```bash
+php spark newsletter:e2e:prepare --run-id="$RUN_ID" --project-key=test-project-key --cleanup-only
+```
+
 Convenciones recomendadas:
 
 - Campaign name: `Campaign ${RUN_ID}`
